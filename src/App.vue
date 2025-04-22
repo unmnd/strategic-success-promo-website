@@ -1,47 +1,25 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <div ref="main" class="h-[8000px]">
+    <div class="sticky top-0 h-[100vh] flex items-center justify-center">
+      <MainStage />
     </div>
-  </header>
 
-  <main>
-    <TheWelcome />
-  </main>
+    {{ stateStore.scroll }}
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
+<script setup lang="ts">
+import MainStage from './components/MainStage.vue'
+import { ref } from 'vue'
+import { useStageStore } from './stores/stage'
+
+const main = ref<HTMLElement | null>(null)
+
+const stateStore = useStageStore()
+
+window.onscroll = () => {
+  stateStore.setScroll(window.scrollY)
 }
+</script>
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>
+<style scoped></style>

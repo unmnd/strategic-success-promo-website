@@ -1,35 +1,58 @@
-@import './base.css';
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;700&family=Roboto:wght@300;700&display=swap');
+@import url('../../node_modules/remixicon/fonts/remixicon.css');
+@import url('./shadcn.css');
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
-}
+@import 'tailwindcss';
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
+@layer base {
+  .rounded-t-xl {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
   }
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+  .rounded-b-xl {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+  }
+
+  .rounded-l-xl {
+    border-top-left-radius: 0.75rem;
+    border-bottom-left-radius: 0.75rem;
+  }
+
+  .rounded-r-xl {
+    border-top-right-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+  }
+
+  /* For Webkit-based browsers (Chrome, Safari and Opera) */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* For IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .font-mono {
+    font-family: 'Roboto Mono', monospace !important;
+  }
+
+  .bg-zinc-925 {
+    background-color: #141417;
+  }
+
+  html {
+    font-family: 'Roboto Mono', monospace;
+    font-family: 'Roboto', sans-serif;
+
+    /* @apply text-white;
+    @apply font-light; */
+    /* @apply bg-gradient-to-b from-zinc-900 to-zinc-950; */
+    /* @apply bg-zinc-950; */
+    /* @apply bg-zinc-925;
+    @apply antialiased; */
   }
 }
