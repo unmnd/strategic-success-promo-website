@@ -1,21 +1,44 @@
-import { ref, computed } from 'vue'
+import { ref, computed, type Ref } from 'vue'
 import { defineStore } from 'pinia'
+import { createTimeline } from 'animejs'
+
+export interface Section {
+  id: string
+  element: Ref<HTMLElement | null>
+}
 
 export const useStageStore = defineStore('stage', () => {
-  const height = ref(8000)
+  // Section management
+  const sections: Section[] = [
+    {
+      id: 'intro',
+      element: ref(null),
+    },
+    {
+      id: 'animateInStage',
+      element: ref(null),
+    },
+    {
+      id: 'mainStageInitialScroll',
+      element: ref(null),
+    },
+  ]
 
-  const _scroll = ref(0)
-  const scroll = computed(() => {
-    return _scroll.value / (height.value - window.innerHeight)
-  })
-
-  const setScroll = (value: number) => {
-    _scroll.value = value
+  function addSectionElement(id: string, element: HTMLElement) {
+    const section = getSection(id)
+    if (section) {
+      section.element.value = element
+    }
   }
 
-  const roundProgress = computed(() => {
-    return scroll.value
-  })
+  // Get a specific section
+  const getSection = (id: string) => {
+    return sections.find((s) => s.id === id)
+  }
 
-  return { roundProgress, scroll, setScroll }
+  return {
+    sections,
+    getSection,
+    addSectionElement,
+  }
 })

@@ -6,10 +6,7 @@
 
     <div class="absolute w-full h-2 top-2 mt-px px-2">
       <div class="w-full h-full border border-zinc-800 rounded-full bg-zinc-950">
-        <div
-          class="h-full bg-white rounded-full"
-          :style="{ width: roundProgress * 100 + '%' }"
-        ></div>
+        <div ref="progressBar" class="h-full bg-white rounded-full"></div>
       </div>
     </div>
 
@@ -23,20 +20,39 @@
 import ImageNatural from './ImageNatural.vue'
 import { useStageStore } from '../stores/stage'
 import { storeToRefs } from 'pinia'
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { animate, onScroll } from 'animejs'
 
-const stateStore = useStageStore()
-const { roundProgress } = storeToRefs(stateStore)
+const mainBody = document.querySelector('body')
 
-const totalSeconds = computed(() => Math.floor((1 - roundProgress.value) * 420)) // 7 minutes = 420 seconds
-const formattedTime = computed(() => {
-  if (totalSeconds.value < 0) return '00:00'
+if (!mainBody) {
+  throw new Error('HeaderImage: main body is required')
+}
 
-  const seconds = totalSeconds.value
-  const minutes = Math.floor(seconds / 60)
-  const remainingSeconds = seconds % 60
-  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
+const progressBar = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  animate(progressBar.value!, {
+    width: ['0%', '100%'],
+    duration: 1000,
+    autoplay: onScroll({
+      target: mainBody,
+      enter: 'start',
+      leave: 'end',
+      sync: true,
+    }),
+  })
 })
+
+// const totalSeconds = computed(() => Math.floor((1 - roundProgress.value) * 420)) // 7 minutes = 420 seconds
+// const formattedTime = computed(() => {
+//   if (totalSeconds.value < 0) return '00:00'
+//
+//   const seconds = totalSeconds.value
+//   const minutes = Math.floor(seconds / 60)
+//   const remainingSeconds = seconds % 60
+//   return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
+// })
 </script>
 
 <style scoped></style>
