@@ -18,8 +18,6 @@
 
 <script setup lang="ts">
 import ImageNatural from './ImageNatural.vue'
-import { useStageStore } from '../stores/stage'
-import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { animate, onScroll } from 'animejs'
 

@@ -1,32 +1,31 @@
 <template>
-  <GenericSection id="intro" class="h-[200vh]">
-    <div
-      ref="container"
-      class="fixed top-0 w-full flex flex-col items-center justify-center h-screen text-center"
-    >
-      <div>
-        <div ref="logo">
-          <Logo />
-        </div>
-
-        <p class="text-2xl">
-          <span ref="word1" class="opacity-0 inline-block mr-1">Gamify</span>
-          <span ref="word2" class="opacity-0 inline-block mr-1">Learning.</span>
-          <span ref="word3" class="opacity-0 inline-block mr-1">Simulate</span>
-          <span ref="word4" class="opacity-0 inline-block">Success.</span>
-        </p>
+  <!-- <GenericSection id="intro" class="h-[200vh]"> -->
+  <div
+    ref="container"
+    class="fixed top-0 w-full flex flex-col items-center justify-center h-screen text-center"
+  >
+    <div>
+      <div ref="logo" class="opacity-0 scale-90">
+        <Logo />
       </div>
+
+      <p class="text-2xl">
+        <span ref="word1" class="opacity-0 inline-block mr-1">Gamify</span>
+        <span ref="word2" class="opacity-0 inline-block mr-1">Learning.</span>
+        <span ref="word3" class="opacity-0 inline-block mr-1">Simulate</span>
+        <span ref="word4" class="opacity-0 inline-block">Success.</span>
+      </p>
     </div>
-  </GenericSection>
+  </div>
+  <!-- </GenericSection> -->
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { animate, onScroll, ScrollObserver, type AnimationParams, type TargetsParam } from 'animejs'
+import { createTimeline } from 'animejs'
 import { useStageStore } from '../stores/stage'
-import GenericSection from './GenericSection.vue'
-import Logo from './Logo.vue'
-import { storeToRefs } from 'pinia'
+import Logo from './MainLogo.vue'
+import { pause } from '@/utils'
 
 const store = useStageStore()
 const container = ref<HTMLElement | null>(null)
@@ -37,74 +36,64 @@ const word3 = ref<HTMLElement | null>(null)
 const word4 = ref<HTMLElement | null>(null)
 
 onMounted(async () => {
-  animate(logo.value!, {
+  const tl = createTimeline()
+
+  tl.add(logo.value!, {
     opacity: [0, 1],
     scale: [0.9, 1],
     duration: 1500,
     ease: 'outExpo',
-    autoplay: true,
   })
 
-  const sectionElement = await store.getSection('intro')
+  pause(tl)
 
-  animate(word1.value!, {
+  tl.add(word1.value!, {
     opacity: [0, 1],
     translateY: ['10%', '0%'],
     duration: 1500,
     ease: 'outExpo',
-    autoplay: onScroll({
-      target: sectionElement,
-      enter: '-20%',
-    }),
   })
 
-  animate(word2.value!, {
-    opacity: [0, 1],
-    translateY: ['10%', '0%'],
-    duration: 1500,
-    delay: 300,
-    ease: 'outExpo',
-    autoplay: onScroll({
-      target: sectionElement,
-      enter: '-20%',
-    }),
-  })
+  tl.add(
+    word2.value!,
+    {
+      opacity: [0, 1],
+      translateY: ['10%', '0%'],
+      duration: 1500,
+      delay: 300,
+      ease: 'outExpo',
+    },
+    '<<',
+  )
 
-  animate(word3.value!, {
+  tl.add(word3.value!, {
     opacity: [0, 1],
     translateY: ['10%', '0%'],
     duration: 1500,
     ease: 'outExpo',
-    autoplay: onScroll({
-      target: sectionElement,
-      enter: '-80%',
-    }),
   })
 
-  animate(word4.value!, {
-    opacity: [0, 1],
-    translateY: ['10%', '0%'],
-    duration: 1500,
-    delay: 300,
-    ease: 'outExpo',
-    autoplay: onScroll({
-      target: sectionElement,
-      enter: '-80%',
-    }),
-  })
+  tl.add(
+    word4.value!,
+    {
+      opacity: [0, 1],
+      translateY: ['10%', '0%'],
+      duration: 1500,
+      delay: 300,
+      ease: 'outExpo',
+    },
+    '<<',
+  )
 
-  animate(container.value!, {
-    // duration: 500,
+  pause(tl)
+
+  tl.add(container.value!, {
     translateY: ['0%', '-50px'],
     opacity: [1, 0],
     ease: 'inExpo',
-    autoplay: onScroll({
-      target: sectionElement,
-      enter: 'start 0%',
-      leave: 'start end',
-      sync: true,
-    }),
   })
+
+  store.addTimeline('intro', tl)
 })
 </script>
 

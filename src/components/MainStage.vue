@@ -1,9 +1,8 @@
 <template>
-  <GenericSection id="mainStageAnimateIn" class="h-screen">
-    <div ref="scrollTracker"></div>
-  </GenericSection>
-
-  <div class="fixed top-0 h-screen w-screen flex items-center justify-center" ref="container">
+  <div
+    class="fixed top-0 h-screen w-screen flex items-center justify-center translate-y-[100vh]"
+    ref="container"
+  >
     <!--TODO: pointer-events-none & remove mousemove -->
     <div
       class="relative shrink-0 bg-zinc-950 text-foreground border border-zinc-800 rounded-2xl select-none overflow-clip"
@@ -57,9 +56,9 @@ import ImageNatural from './ImageNatural.vue'
 import HeaderImage from './HeaderImage.vue'
 import { onMounted, ref } from 'vue'
 import { useStageStore } from '../stores/stage'
-import GenericSection from './GenericSection.vue'
-import { animate, onScroll, createTimeline } from 'animejs'
-import Cursor from './Cursor.vue'
+import { createTimeline } from 'animejs'
+import Cursor from './MainStageCursor.vue'
+import { pause } from '@/utils'
 
 const container = ref<HTMLElement | null>(null)
 const scrollContainer = ref<HTMLElement | null>(null)
@@ -74,7 +73,6 @@ const mouseX = ref(0)
 const mouseY = ref(0)
 
 const trackMousePosition = (event: MouseEvent) => {
-  console.log('trackMousePosition', event)
   if (stage.value) {
     const rect = stage.value.getBoundingClientRect()
     mouseX.value = Math.round(event.clientX - rect.left)
@@ -85,50 +83,22 @@ const trackMousePosition = (event: MouseEvent) => {
 const store = useStageStore()
 
 // Animate appearance of the stage at section
-onMounted(async () => {
+onMounted(() => {
   const tl = createTimeline()
 
-  // Add window scroll down listener to play the timeline
-  window.addEventListener('scroll', () => {
-    tl.resume()
-  })
-
-  const mainStageAnimateIn = await store.getSection('mainStageAnimateIn')
+  // Timeline setup
+  tl.call(() => {
+    decisionSelected.value = false
+  }, '+=0')
 
   // Section 1: Animate in the stage
   tl.add(container.value!, {
-    translateY: ['100vh', '0'],
+    translateY: ['-100vh'],
     ease: 'outExpo',
-    // autoplay: onScroll({
-    //   target: mainStageAnimateIn,
-    //   enter: 'start -50%',
-    //   leave: 'start end',
-    //   sync: true,
-    // }),
+    duration: 1000,
   })
 
-  //   // Section 2: Scroll for overview
-  //   const mainStageInitialScroll = await store.getSection('mainStageDecisions')
-  //
-  //   animate(scrollContainer.value!, {
-  //     autoplay: onScroll({
-  //       target: mainStageInitialScroll,
-  //       enter: 'start 0%',
-  //     }),
-  //     onBegin: () => {
-  // Create a timeline to sequence the animations
-  // const tl = createTimeline({ defaults: { duration: 500 }, loop: true, loopDelay: 5000 })
-
-  // // Label the start of our timeline
-  // tl.label('start')
-
-  tl.call(() => {
-    // Ensure decision is not selected
-    decisionSelected.value = false
-
-    // Pause until scroll down
-    tl.pause()
-  }, '+=0')
+  pause(tl)
 
   // Animate cursor to initial position
   tl.call(() => {
@@ -141,9 +111,7 @@ onMounted(async () => {
     store.cursorType = 'handpointing'
   }, '+=500')
 
-  tl.call(() => {
-    tl.pause()
-  }, '+=1000')
+  pause(tl)
 
   // Add cursor click after the cursor changes
   tl.call(() => {
@@ -166,10 +134,7 @@ onMounted(async () => {
     '+=0',
   )
 
-  // Pause the timeline
-  tl.call(() => {
-    tl.pause()
-  }, '+=0')
+  pause(tl)
 
   tl.call(() => {
     store.cursorPosition.x = 784
@@ -207,6 +172,11 @@ onMounted(async () => {
     },
     '+=0',
   )
+
+  pause(tl)
+
+  store.addTimeline('mainStage', tl)
+  // tl.play()
   //   },
   // })
 })
