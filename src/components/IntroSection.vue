@@ -1,7 +1,10 @@
 <template>
-  <GenericSection ref="section" id="intro" class="h-[200vh]">
-    <div class="fixed top-0 w-full flex flex-col items-center justify-center h-screen text-center">
-      <div ref="container">
+  <GenericSection id="intro" class="h-[200vh]">
+    <div
+      ref="container"
+      class="fixed top-0 w-full flex flex-col items-center justify-center h-screen text-center"
+    >
+      <div>
         <div ref="logo">
           <Logo />
         </div>
@@ -23,6 +26,7 @@ import { animate, onScroll, ScrollObserver, type AnimationParams, type TargetsPa
 import { useStageStore } from '../stores/stage'
 import GenericSection from './GenericSection.vue'
 import Logo from './Logo.vue'
+import { storeToRefs } from 'pinia'
 
 const store = useStageStore()
 const container = ref<HTMLElement | null>(null)
@@ -32,81 +36,72 @@ const word2 = ref<HTMLElement | null>(null)
 const word3 = ref<HTMLElement | null>(null)
 const word4 = ref<HTMLElement | null>(null)
 
-const section = ref<HTMLElement | null>(null)
-
-onMounted(() => {
-  if (!section.value) {
-    console.error('IntroSection: section is required')
-    return
-  }
-
-  const sectionElement = section.value
-
+onMounted(async () => {
   animate(logo.value!, {
     opacity: [0, 1],
     scale: [0.9, 1],
-    duration: 500,
-    easing: 'easeOutExpo',
-    autoplay: onScroll({
-      target: sectionElement,
-    }),
+    duration: 1500,
+    ease: 'outExpo',
+    autoplay: true,
   })
+
+  const sectionElement = await store.getSection('intro')
 
   animate(word1.value!, {
     opacity: [0, 1],
     translateY: ['10%', '0%'],
-    duration: 500,
-    easing: 'easeOutExpo',
+    duration: 1500,
+    ease: 'outExpo',
     autoplay: onScroll({
       target: sectionElement,
-      enter: '-10%',
+      enter: '-20%',
     }),
   })
 
   animate(word2.value!, {
     opacity: [0, 1],
     translateY: ['10%', '0%'],
-    duration: 500,
-    delay: 100,
-    easing: 'easeOutExpo',
+    duration: 1500,
+    delay: 300,
+    ease: 'outExpo',
     autoplay: onScroll({
       target: sectionElement,
-      enter: '-10%',
+      enter: '-20%',
     }),
   })
 
   animate(word3.value!, {
     opacity: [0, 1],
     translateY: ['10%', '0%'],
-    duration: 500,
-    easing: 'easeOutExpo',
+    duration: 1500,
+    ease: 'outExpo',
     autoplay: onScroll({
       target: sectionElement,
-      enter: '-30%',
+      enter: '-80%',
     }),
   })
 
   animate(word4.value!, {
     opacity: [0, 1],
     translateY: ['10%', '0%'],
-    duration: 500,
-    delay: 100,
-    easing: 'easeOutExpo',
+    duration: 1500,
+    delay: 300,
+    ease: 'outExpo',
     autoplay: onScroll({
       target: sectionElement,
-      enter: '-30%',
+      enter: '-80%',
     }),
   })
 
   animate(container.value!, {
-    scale: [1, 0.9],
     // duration: 500,
-    // translateY: ['0%', '-100%'],
-    // opacity: [1, 0],
+    translateY: ['0%', '-50px'],
+    opacity: [1, 0],
+    ease: 'inExpo',
     autoplay: onScroll({
       target: sectionElement,
-      enter: 'start 0',
-      leave: 'end 0',
+      enter: 'start 0%',
+      leave: 'start end',
       sync: true,
     }),
   })

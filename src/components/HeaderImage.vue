@@ -34,25 +34,30 @@ const progressBar = ref<HTMLElement | null>(null)
 onMounted(() => {
   animate(progressBar.value!, {
     width: ['0%', '100%'],
-    duration: 1000,
+    duration: 1,
     autoplay: onScroll({
       target: mainBody,
       enter: 'start',
       leave: 'end',
       sync: true,
     }),
+    onUpdate: (e) => {
+      roundProgress.value = e.progress
+    },
   })
 })
 
-// const totalSeconds = computed(() => Math.floor((1 - roundProgress.value) * 420)) // 7 minutes = 420 seconds
-// const formattedTime = computed(() => {
-//   if (totalSeconds.value < 0) return '00:00'
-//
-//   const seconds = totalSeconds.value
-//   const minutes = Math.floor(seconds / 60)
-//   const remainingSeconds = seconds % 60
-//   return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
-// })
+const roundProgress = ref(0)
+
+const totalSeconds = computed(() => Math.floor((1 - roundProgress.value) * 420)) // 7 minutes = 420 seconds
+const formattedTime = computed(() => {
+  if (totalSeconds.value < 0) return '00:00'
+
+  const seconds = totalSeconds.value
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
+})
 </script>
 
 <style scoped></style>
