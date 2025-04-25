@@ -5,7 +5,7 @@ import { createTimeline, Timeline } from 'animejs'
 export interface SubTimeline {
   id: string
   timeline: Timeline
-  completed: boolean
+  reverseCallback?: () => Promise<void>
 }
 
 export const useStageStore = defineStore('stage', () => {
@@ -28,16 +28,16 @@ export const useStageStore = defineStore('stage', () => {
   const scrollThreshold = 100
 
   // Add a component timeline to the main timeline
-  function addTimeline(id: string, timeline: Timeline) {
+  function addTimeline(id: string, timeline: Timeline, reverseCallback?: () => Promise<void>) {
     // Set self as completed when the timeline is finished
     timeline.call(() => {
-      subTimelines.value[currentTimelineIndex.value].completed = true
+      currentTimelineIndex.value++
     }, '+=0')
 
     subTimelines.value.push({
       id,
       timeline,
-      completed: false,
+      reverseCallback,
     })
 
     // Add the timeline to the main sequence
@@ -57,11 +57,23 @@ export const useStageStore = defineStore('stage', () => {
     mainTimeline.value.pause()
   }
 
-  function restartCurrentTimeline() {
+  async function restartCurrentTimeline() {
     if (currentTimelineIndex.value > 0) {
+      // Disable pause state during reversal
+      isPaused.value = false
+
+      // Execute the reversal callback of current timeline if available
+      const currentTimeline = subTimelines.value[currentTimelineIndex.value]
+      if (currentTimeline.reverseCallback) {
+        try {
+          await currentTimeline.reverseCallback()
+        } catch (error) {
+          console.error(`Error during reverse animation for ${currentTimeline.id}:`, error)
+        }
+      }
+
       // Go back one timeline
       currentTimelineIndex.value--
-      subTimelines.value[currentTimelineIndex.value].completed = false
 
       // Calculate the position to seek to
       let seekPosition = 0
@@ -71,12 +83,10 @@ export const useStageStore = defineStore('stage', () => {
 
       // Seek to the beginning of the current timeline
       mainTimeline.value.seek(seekPosition)
-    } else {
-      // Restart the main timeline
-      mainTimeline.value.restart()
-    }
 
-    resumeTimeline()
+      // Keep playing after reversal
+      resumeTimeline()
+    }
   }
 
   // Handle scroll events

@@ -45,8 +45,6 @@ onMounted(async () => {
     ease: 'outExpo',
   })
 
-  pause(tl)
-
   tl.add(word1.value!, {
     opacity: [0, 1],
     translateY: ['10%', '0%'],

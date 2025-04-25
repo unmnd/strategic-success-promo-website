@@ -56,7 +56,7 @@ import ImageNatural from './ImageNatural.vue'
 import HeaderImage from './HeaderImage.vue'
 import { onMounted, ref } from 'vue'
 import { useStageStore } from '../stores/stage'
-import { createTimeline } from 'animejs'
+import { animate, createTimeline } from 'animejs'
 import Cursor from './MainStageCursor.vue'
 import { pause } from '@/utils'
 
@@ -175,10 +175,23 @@ onMounted(() => {
 
   pause(tl)
 
-  store.addTimeline('mainStage', tl)
-  // tl.play()
-  //   },
-  // })
+  // Define the reversal animation function
+  const reverseAnimation = async (): Promise<void> => {
+    return new Promise<void>((resolve) => {
+      console.log('reverseAnimation')
+
+      animate(container.value!, {
+        translateY: ['100vh'],
+        ease: 'inExpo',
+        duration: 1000,
+        onComplete: () => {
+          resolve()
+        },
+      })
+    })
+  }
+
+  store.addTimeline('mainStage', tl, reverseAnimation)
 })
 </script>
 
