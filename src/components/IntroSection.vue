@@ -9,11 +9,11 @@
         <Logo />
       </div>
 
-      <p class="text-2xl">
-        <span ref="word1" class="opacity-0 inline-block mr-1">Gamify</span>
-        <span ref="word2" class="opacity-0 inline-block mr-1">Learning.</span>
-        <span ref="word3" class="opacity-0 inline-block mr-1">Simulate</span>
-        <span ref="word4" class="opacity-0 inline-block">Success.</span>
+      <p class="text-xl">
+        <span ref="word1" class="opacity-0 inline-block mr-1">gamify</span>
+        <span ref="word2" class="opacity-0 inline-block mr-1">learning.</span>
+        <span ref="word3" class="opacity-0 inline-block mr-1">simulating</span>
+        <span ref="word4" class="opacity-0 inline-block">success.</span>
       </p>
     </div>
   </div>
