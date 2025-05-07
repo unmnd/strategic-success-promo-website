@@ -1,90 +1,141 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { createTimeline, Timeline } from 'animejs'
+import { createTimeline } from 'animejs'
 
-export interface SubTimeline {
+export interface Checkpoint {
   id: string
-  timeline: Timeline
+  position: number
   reverseCallback?: () => Promise<void>
 }
+
+// LocalStorage constants
+const CHECKPOINT_STORAGE_KEY = 'stageCheckpoint'
+const CHECKPOINT_TIMEOUT_MS = 10 * 60 * 1000 // 10 minutes in milliseconds
 
 export const useStageStore = defineStore('stage', () => {
   const WIDTH = 1200
   const HEIGHT = 720
 
-  // Timeline management
-  const mainTimeline = ref<Timeline>(
-    createTimeline({
-      autoplay: true,
-    }),
-  )
+  // Create a single main timeline
+  const mainTimeline = createTimeline({
+    autoplay: false,
+  })
 
-  const subTimelines = ref<SubTimeline[]>([])
-  const currentTimelineIndex = ref(0)
+  // Checkpoint management
+  const checkpoints = ref<Checkpoint[]>([])
+
+  const checkPointStorage = JSON.parse(localStorage.getItem(CHECKPOINT_STORAGE_KEY) || '{}')
+  const currentCheckpointIndex = ref(
+    Date.now() - (checkPointStorage.timestamp || 0) > CHECKPOINT_TIMEOUT_MS
+      ? 0
+      : checkPointStorage.index || 0,
+  )
+  const currentCheckpoint = computed(() => checkpoints.value[currentCheckpointIndex.value]?.id)
+
+  watch(currentCheckpointIndex, (newIndex) => {
+    console.log('🔄 Saving checkpoint', newIndex)
+    localStorage.setItem(
+      CHECKPOINT_STORAGE_KEY,
+      JSON.stringify({
+        index: newIndex,
+        timestamp: Date.now(),
+      }),
+    )
+  })
+
   const isPaused = ref(false)
 
   // Scroll handling
   const lastScrollY = ref(0)
   const scrollThreshold = 100
 
-  // Add a component timeline to the main timeline
-  function addTimeline(id: string, timeline: Timeline, reverseCallback?: () => Promise<void>) {
-    // Set self as completed when the timeline is finished
-    timeline.call(() => {
-      currentTimelineIndex.value++
-    }, '+=0')
+  // Create a checkpoint at the current timeline position
+  function createCheckpoint(id: string, reverseCallback?: () => Promise<void>) {
+    const position = mainTimeline.duration
 
-    subTimelines.value.push({
+    const checkpoint = {
       id,
-      timeline,
+      position,
       reverseCallback,
-    })
+    }
 
-    // Add the timeline to the main sequence
-    mainTimeline.value.sync(timeline)
+    const checkpointIndex = checkpoints.value.length
+
+    // Add a callback at this position to update current checkpoint
+    mainTimeline.call(() => {
+      currentCheckpointIndex.value = checkpointIndex
+    }, position)
+
+    checkpoints.value.push(checkpoint)
+
+    return position
+  }
+
+  // Go to a specific checkpoint
+  function goToCheckpoint(index: number) {
+    if (index >= 0 && index < checkpoints.value.length) {
+      const position = checkpoints.value[index].position
+      mainTimeline.seek(position)
+      currentCheckpointIndex.value = index
+      mainTimeline.resume()
+    }
   }
 
   // Control functions
   function resumeTimeline() {
-    console.log('resumeTimeline')
+    console.log('⏱️ Timeline resumed')
     isPaused.value = false
-    mainTimeline.value.resume()
+    mainTimeline.resume()
   }
 
   function pauseTimeline() {
-    console.log('pauseTimeline')
+    console.log('⏸️ Timeline paused')
     isPaused.value = true
-    mainTimeline.value.pause()
+    mainTimeline.pause()
   }
 
-  async function restartCurrentTimeline() {
-    if (currentTimelineIndex.value > 0) {
+  // Go to previous checkpoint
+  async function goToPreviousCheckpoint() {
+    if (currentCheckpointIndex.value > 0) {
       // Disable pause state during reversal
       isPaused.value = false
 
-      // Execute the reversal callback of current timeline if available
-      const currentTimeline = subTimelines.value[currentTimelineIndex.value]
-      if (currentTimeline.reverseCallback) {
+      // Execute the reversal callback if available
+      const currentCheckpoint = checkpoints.value[currentCheckpointIndex.value]
+      if (currentCheckpoint.reverseCallback) {
         try {
-          await currentTimeline.reverseCallback()
+          await currentCheckpoint.reverseCallback()
         } catch (error) {
-          console.error(`Error during reverse animation for ${currentTimeline.id}:`, error)
+          console.error(`Error during reverse animation for ${currentCheckpoint.id}:`, error)
         }
       }
 
-      // Go back one timeline
-      currentTimelineIndex.value--
+      // Get the position of the previous checkpoint
+      const prevIndex = currentCheckpointIndex.value - 1
+      const prevPosition = prevIndex >= 0 ? checkpoints.value[prevIndex].position : 0
 
-      // Calculate the position to seek to
-      let seekPosition = 0
-      for (let i = 0; i < currentTimelineIndex.value; i++) {
-        seekPosition += subTimelines.value[i].timeline.duration
-      }
+      // Seek to the previous checkpoint
+      mainTimeline.seek(prevPosition)
+      currentCheckpointIndex.value = prevIndex
 
-      // Seek to the beginning of the current timeline
-      mainTimeline.value.seek(seekPosition)
+      // Keep playing after seeking
+      resumeTimeline()
+    }
+  }
 
-      // Keep playing after reversal
+  // Go to next checkpoint
+  function goToNextCheckpoint() {
+    if (currentCheckpointIndex.value < checkpoints.value.length - 1) {
+      const nextIndex = currentCheckpointIndex.value + 1
+      const nextPosition = checkpoints.value[nextIndex].position
+
+      // Seek to the next checkpoint
+      mainTimeline.seek(nextPosition)
+      currentCheckpointIndex.value = nextIndex
+
+      resumeTimeline()
+    } else {
+      // If we're at the last checkpoint, just resume playing
       resumeTimeline()
     }
   }
@@ -100,11 +151,11 @@ export const useStageStore = defineStore('stage', () => {
       // Scrolling down - continue animation if paused
       resumeTimeline()
     } else if (event.deltaY < 0) {
-      // Scrolling up - restart current timeline if scrolled enough
+      // Scrolling up - go to previous checkpoint if scrolled enough
       lastScrollY.value += Math.abs(event.deltaY)
 
       if (lastScrollY.value >= scrollThreshold) {
-        restartCurrentTimeline()
+        goToPreviousCheckpoint()
         lastScrollY.value = 0
       }
     }
@@ -113,6 +164,13 @@ export const useStageStore = defineStore('stage', () => {
   // Setup scroll listener
   onMounted(() => {
     window.addEventListener('wheel', handleScroll)
+
+    setTimeout(() => {
+      goToCheckpoint(currentCheckpointIndex.value)
+
+      console.log('🔄 Restored checkpoint', currentCheckpointIndex.value)
+      console.log('checkpoints', checkpoints.value)
+    }, 100)
   })
 
   onUnmounted(() => {
@@ -127,14 +185,17 @@ export const useStageStore = defineStore('stage', () => {
   return {
     WIDTH,
     HEIGHT,
-    mainTimeline,
-    subTimelines,
-    currentTimelineIndex,
+    timeline: mainTimeline,
+    checkpoints,
+    currentCheckpointIndex,
+    currentCheckpoint,
     isPaused,
-    addTimeline,
+    createCheckpoint,
     playTimeline: resumeTimeline,
     pauseTimeline,
-    restartCurrentTimeline,
+    goToPreviousCheckpoint,
+    goToNextCheckpoint,
+    goToCheckpoint,
     cursorType,
     cursorPosition,
     cursorClick,
