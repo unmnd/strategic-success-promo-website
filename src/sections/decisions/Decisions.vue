@@ -8,7 +8,7 @@
       <div class="divide-y divide-border relative">
         <TransitionGroup name="list">
           <div
-            v-for="decision in store.decisions"
+            v-for="decision in decisions"
             :key="decision"
             class="grid grid-cols-[min-content_1fr_min-content] items-center py-4 px-4 hover:bg-muted/50"
           >
@@ -21,7 +21,7 @@
             </div>
           </div>
           <div
-            v-if="store.decisions.length === 0"
+            v-if="decisions.length === 0"
             class="flex items-center text-muted-foreground justify-center w-full h-full gap-2"
           >
             <i class="ri-error-warning-line"></i>
@@ -38,9 +38,7 @@
       @close="selectedEffect = undefined"
       @select="
         () => {
-          if (selectedEffect) {
-            store.removeDecision(selectedEffect)
-          }
+          decisions = decisions.filter((el) => el !== selectedEffect)
           selectedEffect = undefined
         }
       "
@@ -52,13 +50,21 @@
 import { computed, ref } from 'vue'
 
 import EffectInfo from './EffectInfo.vue'
-import { useDecisionsStore } from '~/sections/decisions/decisions.store'
 
 import { Card, CardContent } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { EFFECT_INFO } from './decisions.config'
 
-const store = useDecisionsStore()
+const decisions = ref<(keyof typeof EFFECT_INFO)[]>([
+  'tradeShowPositiveReputation',
+  'newYearMarketingCampaign',
+  'staffPayRise',
+])
+
+setTimeout(() => {
+  decisions.value.push('expandWarehouse')
+}, 5000)
+
 const selectedEffect = ref<keyof typeof EFFECT_INFO | undefined>()
 const selectedEffectInfo = computed(() =>
   selectedEffect.value ? EFFECT_INFO[selectedEffect.value] : undefined,
