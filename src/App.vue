@@ -1,5 +1,8 @@
 <template>
   <div ref="main" class="w-full h-full hidden lg:block">
+    <!-- Global Background -->
+    <Background />
+
     <!-- Intro Section -->
     <IntroSection />
 
@@ -27,6 +30,7 @@ import IntroSection from './sections/intro/IntroSection.vue'
 import ScrollPrompt from './components/ScrollPrompt.vue'
 import DecisionsSection from './sections/decisions/DecisionsSection.vue'
 import InteractivityNote from './sections/intro/InteractivityNote.vue'
+import Background from './components/Background.vue'
 
 import { useColorMode } from '@vueuse/core'
 

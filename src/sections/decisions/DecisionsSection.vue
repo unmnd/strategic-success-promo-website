@@ -1,7 +1,5 @@
 <template>
   <div ref="container" class="inset-0 absolute opacity-0 px-8">
-    <img ref="background" :src="darkGeneric" class="fixed inset-0 object-cover w-screen h-screen" />
-
     <div class="relative w-full h-screen flex items-center justify-center gap-16">
       <div ref="decisions" class="opacity-0 basis-2/3">
         <Decisions class="max-w-4xl" />
@@ -31,19 +29,26 @@ import { useStageStore } from '~/stores/stage'
 import { onMounted, ref } from 'vue'
 import { fx } from '~/utils'
 import { useDecisionsStore } from '~/sections/decisions/decisions.store'
+import { useBackgroundStore } from '~/stores/background'
 
 import darkGeneric from '~/assets/backgrounds/dark_generic.jpg'
 
 const store = useStageStore()
 const decisionsStore = useDecisionsStore()
+const backgroundStore = useBackgroundStore()
 
 const container = ref<HTMLElement | null>(null)
-const background = ref<HTMLElement | null>(null)
 const text = ref<HTMLElement | null>(null)
 const decisions = ref<HTMLElement | null>(null)
 
 onMounted(async () => {
-  store.createCheckpoint('decisions')
+  store.createCheckpoint('decisions', async () => {
+    backgroundStore.setBackground(null)
+  })
+
+  store.timeline.call(() => {
+    backgroundStore.setBackground(darkGeneric)
+  }, '+=0')
 
   store.timeline.add(
     container.value!,
@@ -52,16 +57,6 @@ onMounted(async () => {
       duration: 0,
     },
     '+=0',
-  )
-
-  store.timeline.add(
-    background.value!,
-    {
-      opacity: [0, 0.3],
-      ease: 'inQuad',
-      duration: 10000,
-    },
-    '<<',
   )
 
   store.timeline.add(decisions.value!, fx.fadeUp, '<<+=300')

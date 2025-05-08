@@ -62,6 +62,8 @@ export const useStageStore = defineStore('stage', () => {
     const checkpointIndex = checkpoints.value.length
 
     // Add a callback at this position to update current checkpoint
+    mainTimeline.label(id)
+
     mainTimeline.call(() => {
       currentCheckpointIndex.value = checkpointIndex
     }, position)
