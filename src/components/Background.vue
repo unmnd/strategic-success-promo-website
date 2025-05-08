@@ -1,8 +1,8 @@
 <template>
   <img
-    ref="background"
-    v-if="src"
-    :src="src"
+    ref="image"
+    v-show="src"
+    :src="src || undefined"
     class="fixed inset-0 object-cover w-screen h-screen"
   />
   <div ref="black" class="fixed inset-0 bg-background"></div>
@@ -15,10 +15,11 @@ import { createTimeline, Timeline } from 'animejs'
 
 const backgroundStore = useBackgroundStore()
 
-const background = ref<HTMLElement | null>(null)
+const image = ref<HTMLElement | null>(null)
+const black = ref<HTMLElement | null>(null)
 
 const src = ref(backgroundStore.currentBackground)
-const black = ref<HTMLElement | null>(null)
+const srcLoaded = ref<Promise<void> | null>(null)
 
 const tl = ref<Timeline>(createTimeline({ autoplay: true }))
 
@@ -27,21 +28,29 @@ watch(
   (newSrc) => {
     tl.value.cancel()
 
-    tl.value = createTimeline({ autoplay: true })
-
-    tl.value.add(black.value!, {
-      opacity: 1,
-      //   duration: () => 2000 * parseFloat(black.value!.style?.opacity || '0'),
-      duration: 2000,
+    srcLoaded.value = new Promise((resolve) => {
+      image.value!.addEventListener('load', () => {
+        resolve()
+      })
     })
 
-    tl.value.call(() => {
-      src.value = newSrc
-    }, '+=0')
+    tl.value = createTimeline({ autoplay: true })
+      .add(black.value!, {
+        opacity: 1,
+        duration: 5000 * parseFloat(black.value!.style?.opacity || '0'),
+      })
 
-    tl.value.add(black.value!, { opacity: 0.5, duration: 5000 }, '+=0')
+      .call(() => {
+        src.value = newSrc
+      }, '+=0')
+
+      .call(async () => {
+        await srcLoaded.value!
+      }, '+=0')
+
+      .add(black.value!, { opacity: 0.5, duration: 5000 }, '+=10')
+      .add(image.value!, { filter: ['blur(40px)', 'blur(0px)'], duration: 10000 }, '<<')
   },
-  { immediate: true },
 )
 </script>
 
