@@ -30,7 +30,7 @@ onMounted(() => {
     backgroundStore.setBackground(corporateGeneric)
   }, '+=0')
 
-  store.timeline.add(container.value!, fx.fadeIn, '<<-=500')
+  store.timeline.add(container.value!, fx.fadeIn, '<<')
 
   store.timeline.call(() => {
     store.pauseTimeline()

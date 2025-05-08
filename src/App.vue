@@ -3,18 +3,14 @@
     <!-- Global Background -->
     <Background />
 
-    <!-- Intro Section -->
-    <IntroSection />
-
-    <InteractivityNote />
-
-    <!-- Main Stage Section -->
-    <!-- <MainStage /> -->
-
-    <DecisionsSection />
-
     <!-- Scroll Prompt -->
     <ScrollPrompt />
+
+    <!-- Sections -->
+    <IntroSection />
+    <InteractivityNote />
+    <DecisionsSection />
+    <SkillsSection />
   </div>
 
   <div class="lg:hidden">
@@ -33,6 +29,7 @@ import InteractivityNote from './sections/intro/InteractivityNote.vue'
 import Background from './components/Background.vue'
 
 import { useColorMode } from '@vueuse/core'
+import SkillsSection from './sections/skills/SkillsSection.vue'
 
 useColorMode()
 </script>

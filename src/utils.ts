@@ -15,6 +15,13 @@ export const fx = {
     ease: 'outExpo',
   },
 
+  fadeUpOut: {
+    opacity: 0,
+    translateY: '-4rem',
+    duration: DEFAULT_DURATION * 0.5,
+    ease: 'inExpo',
+  },
+
   fadeIn: {
     opacity: [0, 1],
     scale: [0.9, 1],
@@ -25,7 +32,7 @@ export const fx = {
   fadeOut: {
     opacity: [1, 0],
     scale: [1, 0.9],
-    duration: DEFAULT_DURATION,
+    duration: DEFAULT_DURATION * 0.5,
     ease: 'inExpo',
   },
 }
