@@ -1,11 +1,11 @@
 <template>
-  <img
-    ref="image"
-    v-show="src"
-    :src="src || undefined"
-    class="fixed inset-0 object-cover w-screen h-screen"
-  />
-  <div ref="black" class="fixed inset-0 bg-background"></div>
+    <img
+        ref="image"
+        v-show="src"
+        :src="src || undefined"
+        class="fixed inset-0 object-cover w-screen h-screen"
+    />
+    <div ref="black" class="fixed inset-0 bg-background"></div>
 </template>
 
 <script setup lang="ts">
@@ -26,33 +26,33 @@ const srcLoaded = ref<Promise<void> | null>(null)
 const tl = ref<Timeline>(createTimeline({ autoplay: true }))
 
 watch(
-  () => backgroundStore.currentBackground,
-  (newSrc) => {
-    tl.value.cancel()
+    () => backgroundStore.currentBackground,
+    (newSrc) => {
+        tl.value.cancel()
 
-    srcLoaded.value = new Promise((resolve) => {
-      image.value!.addEventListener('load', () => {
-        resolve()
-      })
-    })
+        srcLoaded.value = new Promise((resolve) => {
+            image.value!.addEventListener('load', () => {
+                resolve()
+            })
+        })
 
-    tl.value = createTimeline({ autoplay: true })
-      .add(black.value!, {
-        opacity: 1,
-        duration: 5000 * parseFloat(black.value!.style?.opacity || '0'),
-      })
+        tl.value = createTimeline({ autoplay: true })
+            .add(black.value!, {
+                opacity: 1,
+                duration: 5000 * parseFloat(black.value!.style?.opacity || '0'),
+            })
 
-      .call(() => {
-        src.value = newSrc
-      }, '+=0')
+            .call(() => {
+                src.value = newSrc
+            }, '+=0')
 
-      .call(async () => {
-        await srcLoaded.value!
-      }, '+=0')
+            .call(async () => {
+                await srcLoaded.value!
+            }, '+=0')
 
-      .add(black.value!, { opacity: 1 - BACKGROUND_OPACITY, duration: 5000 }, '+=10')
-      .add(image.value!, { filter: ['blur(40px)', 'blur(0px)'], duration: 10000 }, '<<')
-  },
+            .add(black.value!, { opacity: 1 - BACKGROUND_OPACITY, duration: 5000 }, '+=10')
+            .add(image.value!, { filter: ['blur(40px)', 'blur(0px)'], duration: 10000 }, '<<')
+    },
 )
 </script>
 

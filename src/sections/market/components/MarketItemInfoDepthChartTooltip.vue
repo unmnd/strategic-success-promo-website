@@ -1,31 +1,31 @@
 <template>
-  <Card class="text-sm">
-    <CardHeader v-if="title" class="p-3 border-b">
-      <CardTitle>
-        {{ formatter(parseInt(title)) }}
-      </CardTitle>
-    </CardHeader>
-    <CardContent class="p-3 min-w-[180px] flex flex-col gap-1">
-      <div v-for="(item, key) in data" :key="key" class="flex justify-between">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5">
-            <svg width="100%" height="100%" viewBox="0 0 30 30">
-              <path
-                d=" M 15 15 m -14, 0 a 14,14 0 1,1 28,0 a 14,14 0 1,1 -28,0"
-                :stroke="item.color"
-                :fill="item.color"
-                stroke-width="1"
-              />
-            </svg>
-          </span>
-          <span>{{
-            item.name === 'buy' ? 'Items Requested (Buy)' : 'Items Available (Sell)'
-          }}</span>
-        </div>
-        <span class="font-semibold ml-4">{{ item.value }}</span>
-      </div>
-    </CardContent>
-  </Card>
+    <Card class="text-sm">
+        <CardHeader v-if="title" class="p-3 border-b">
+            <CardTitle>
+                {{ formatter(parseInt(title)) }}
+            </CardTitle>
+        </CardHeader>
+        <CardContent class="p-3 min-w-[180px] flex flex-col gap-1">
+            <div v-for="(item, key) in data" :key="key" class="flex justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5">
+                        <svg width="100%" height="100%" viewBox="0 0 30 30">
+                            <path
+                                d=" M 15 15 m -14, 0 a 14,14 0 1,1 28,0 a 14,14 0 1,1 -28,0"
+                                :stroke="item.color"
+                                :fill="item.color"
+                                stroke-width="1"
+                            />
+                        </svg>
+                    </span>
+                    <span>{{
+                        item.name === 'buy' ? 'Items Requested (Buy)' : 'Items Available (Sell)'
+                    }}</span>
+                </div>
+                <span class="font-semibold ml-4">{{ item.value }}</span>
+            </div>
+        </CardContent>
+    </Card>
 </template>
 
 <script setup lang="ts">
@@ -33,12 +33,12 @@ import { formatter } from '~/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 
 const props = defineProps<{
-  title?: string
-  data: {
-    name: string
-    color: string
-    value: any // eslint-disable-line @typescript-eslint/no-explicit-any
-  }[]
+    title?: string
+    data: {
+        name: string
+        color: string
+        value: any // eslint-disable-line @typescript-eslint/no-explicit-any
+    }[]
 }>()
 
 const data = props.data.filter((d) => d.name !== 'price')

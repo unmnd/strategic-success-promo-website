@@ -11,29 +11,29 @@ import finance from '~/assets/backgrounds/finance.jpg'
 
 // Define all sections and their components in a single place
 export const SECTIONS = [
-  {
-    id: 'intro',
-    component: IntroSection,
-    background: null, // No background for intro
-  },
-  {
-    id: 'interactivity',
-    component: InteractivityNote,
-    background: null, // No background for interactivity note
-  },
-  {
-    id: 'decisions',
-    component: DecisionsSection,
-    background: darkGeneric,
-  },
-  {
-    id: 'skills',
-    component: SkillsSection,
-    background: corporateGeneric,
-  },
-  {
-    id: 'market',
-    component: MarketSection,
-    background: finance,
-  },
+    {
+        id: 'intro',
+        component: IntroSection,
+        background: null, // No background for intro
+    },
+    {
+        id: 'interactivity',
+        component: InteractivityNote,
+        background: null, // No background for interactivity note
+    },
+    {
+        id: 'decisions',
+        component: DecisionsSection,
+        background: darkGeneric,
+    },
+    {
+        id: 'skills',
+        component: SkillsSection,
+        background: corporateGeneric,
+    },
+    {
+        id: 'market',
+        component: MarketSection,
+        background: finance,
+    },
 ] as const

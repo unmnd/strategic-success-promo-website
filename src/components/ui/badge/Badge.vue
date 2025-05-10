@@ -6,25 +6,25 @@ import { computed, type HTMLAttributes } from 'vue'
 import { type BadgeVariants, badgeVariants } from '.'
 
 const props = defineProps<
-  PrimitiveProps & {
-    variant?: BadgeVariants['variant']
-    class?: HTMLAttributes['class']
-  }
+    PrimitiveProps & {
+        variant?: BadgeVariants['variant']
+        class?: HTMLAttributes['class']
+    }
 >()
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props
+    const { class: _, ...delegated } = props
 
-  return delegated
+    return delegated
 })
 </script>
 
 <template>
-  <Primitive
-    data-slot="badge"
-    :class="cn(badgeVariants({ variant }), props.class)"
-    v-bind="delegatedProps"
-  >
-    <slot />
-  </Primitive>
+    <Primitive
+        data-slot="badge"
+        :class="cn(badgeVariants({ variant }), props.class)"
+        v-bind="delegatedProps"
+    >
+        <slot />
+    </Primitive>
 </template>
