@@ -13,7 +13,7 @@
             class="grid grid-cols-[min-content_1fr_min-content] items-center py-4 px-4 hover:bg-muted/50"
           >
             <div class="text-sm w-64">{{ EFFECT_INFO[decision].actionName }}</div>
-            <div class="text-muted-foreground text-sm truncate px-4">
+            <div class="text-muted-foreground text-sm line-clamp-2 px-4">
               {{ EFFECT_INFO[decision].description.summary }}
             </div>
             <div class="text-right w-min">
@@ -36,18 +36,15 @@
       :active="false"
       :visibility="'SELECTABLE'"
       @close="selectedEffect = undefined"
-      @select="
-        () => {
-          decisions = decisions.filter((el) => el !== selectedEffect)
-          selectedEffect = undefined
-        }
-      "
+      @select="selectDecision"
     />
   </Card>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
+
+import { toast } from 'vue-sonner'
 
 import EffectInfo from './EffectInfo.vue'
 
@@ -61,9 +58,24 @@ const decisions = ref<(keyof typeof EFFECT_INFO)[]>([
   'staffPayRise',
 ])
 
-setTimeout(() => {
+const timer = setTimeout(() => {
   decisions.value.push('expandWarehouse')
+  toast.info('New Decision Available', {
+    description: 'Warehouse Expansion Oppourtunity',
+  })
 }, 5000)
+
+onUnmounted(() => {
+  clearTimeout(timer)
+})
+
+function selectDecision() {
+  decisions.value = decisions.value.filter((el) => el !== selectedEffect.value)
+  toast.success('Decision Added', {
+    description: EFFECT_INFO[selectedEffect.value!].name,
+  })
+  selectedEffect.value = undefined
+}
 
 const selectedEffect = ref<keyof typeof EFFECT_INFO | undefined>()
 const selectedEffectInfo = computed(() =>

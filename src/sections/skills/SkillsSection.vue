@@ -32,12 +32,7 @@
 import Skills from './Skills.vue'
 import { onMounted, ref } from 'vue'
 import { fx } from '~/utils'
-import { useBackgroundStore } from '~/stores/background'
 import { createTimeline, stagger } from 'animejs'
-
-import corporateGeneric from '~/assets/backgrounds/corporate_generic.jpg'
-
-const backgroundStore = useBackgroundStore()
 
 const text = ref<HTMLElement | null>(null)
 
@@ -46,9 +41,6 @@ const p2 = ref<HTMLElement | null>(null)
 const p3 = ref<HTMLElement | null>(null)
 
 onMounted(() => {
-  // Set background
-  backgroundStore.setBackground(corporateGeneric)
-
   createTimeline().add(
     [text.value!, p1.value!, p2.value!, p3.value!],
     {

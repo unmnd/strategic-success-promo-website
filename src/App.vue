@@ -1,10 +1,12 @@
 <template>
   <div ref="main" class="w-screen h-screen overflow-hidden hidden lg:block">
+    <Toaster />
+
     <!-- Global Background -->
     <Background />
 
     <!-- Scroll Prompt -->
-    <ScrollPrompt />
+    <!-- <ScrollPrompt /> -->
 
     <!-- Router View for Sections -->
     <router-view v-slot="{ Component, route }">
@@ -27,13 +29,14 @@
 </template>
 
 <script setup lang="ts">
-import ScrollPrompt from './components/ScrollPrompt.vue'
+// import ScrollPrompt from './components/ScrollPrompt.vue'
 import Background from './components/Background.vue'
 import { useColorMode } from '@vueuse/core'
 import { goToNextSection, goToPreviousSection } from './router'
 import { Button } from './components/ui/button'
 import { animate } from 'animejs'
 import { fx } from './utils'
+import { Toaster } from './components/ui/sonner'
 
 useColorMode()
 

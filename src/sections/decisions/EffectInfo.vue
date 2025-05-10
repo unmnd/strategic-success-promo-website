@@ -14,7 +14,7 @@
     >
       <DialogHeader>
         <DialogTitle class="flex items-start gap-2 justify-between">
-          <Heading1>{{ active ? info.name : info.actionName }}</Heading1>
+          <h1>{{ active ? info.name : info.actionName }}</h1>
           <Badge v-if="info.ongoing" class="gap-2">
             <i class="ri-timer-line"></i>
             Ongoing
@@ -66,9 +66,6 @@
                 <span v-if="!isAdding">
                   <i class="ri-check-line mr-1"></i>
                   Add
-                </span>
-                <span v-else>
-                  <LoadingSpinner />
                 </span>
               </Button>
             </TooltipTrigger>

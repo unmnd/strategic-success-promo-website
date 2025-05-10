@@ -21,23 +21,22 @@
         </div>
       </div>
 
-      <div ref="market" class="h-screen w-full flex items-center justify-center p-8">
-        <Market />
+      <div
+        ref="market"
+        class="min-h-screen w-full max-w-6xl flex items-center justify-center p-4 mb-8 bg-card rounded-xl border"
+      >
+        <MarketItemInfo />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Market from './Market.vue'
 import { onMounted, ref } from 'vue'
 import { fx } from '~/utils'
-import { useBackgroundStore } from '~/stores/background'
 import { createTimeline, stagger } from 'animejs'
 
-import finance from '~/assets/backgrounds/finance.jpg'
-
-const backgroundStore = useBackgroundStore()
+import MarketItemInfo from './components/MarketItemInfo.vue'
 
 const text = ref<HTMLElement | null>(null)
 
@@ -46,9 +45,6 @@ const p2 = ref<HTMLElement | null>(null)
 const p3 = ref<HTMLElement | null>(null)
 
 onMounted(() => {
-  // Set background
-  backgroundStore.setBackground(finance)
-
   // Setup timeline
   createTimeline().add(
     [text.value!, p1.value!, p2.value!, p3.value!],

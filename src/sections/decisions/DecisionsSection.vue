@@ -30,22 +30,13 @@
 import Decisions from './Decisions.vue'
 import { onMounted, ref } from 'vue'
 import { fx } from '~/utils'
-import { useBackgroundStore } from '~/stores/background'
 import { createTimeline, stagger } from 'animejs'
 
-import darkGeneric from '~/assets/backgrounds/dark_generic.jpg'
-
-const backgroundStore = useBackgroundStore()
-
 const text = ref<HTMLElement | null>(null)
-
 const p1 = ref<HTMLElement | null>(null)
 const p2 = ref<HTMLElement | null>(null)
 
 onMounted(() => {
-  // Set background
-  backgroundStore.setBackground(darkGeneric)
-
   // Setup timeline
   createTimeline().add(
     [text.value!, p1.value!, p2.value!],

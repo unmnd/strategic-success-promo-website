@@ -13,6 +13,8 @@ import { ref, watch } from 'vue'
 import { useBackgroundStore } from '~/stores/background'
 import { createTimeline, Timeline } from 'animejs'
 
+const BACKGROUND_OPACITY = 0.3
+
 const backgroundStore = useBackgroundStore()
 
 const image = ref<HTMLElement | null>(null)
@@ -48,7 +50,7 @@ watch(
         await srcLoaded.value!
       }, '+=0')
 
-      .add(black.value!, { opacity: 0.5, duration: 5000 }, '+=10')
+      .add(black.value!, { opacity: 1 - BACKGROUND_OPACITY, duration: 5000 }, '+=10')
       .add(image.value!, { filter: ['blur(40px)', 'blur(0px)'], duration: 10000 }, '<<')
   },
 )
