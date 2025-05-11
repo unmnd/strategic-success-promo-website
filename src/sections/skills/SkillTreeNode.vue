@@ -27,12 +27,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { SKILL_TREE_NODE_RADIUS, type Node } from './skills.interface'
+import { useSkillsStore } from './skills.store'
+import { EFFECT_INFO } from '../decisions/decisions.config'
 
-import type { Node } from '../effect.interface'
-
-import { SKILL_TREE_NODE_RADIUS } from '~/modules/team/modules/effect/effect.config'
-import { EffectVisibility } from '@/game/effect/effect.interface.enum'
+// import { SKILL_TREE_NODE_RADIUS } from '~/modules/team/modules/effect/effect.config'
+// import { EffectVisibility } from '@/game/effect/effect.interface.enum'
 
 const props = defineProps<{
     node: Node
@@ -42,28 +43,28 @@ const emits = defineEmits<{
     (e: 'clickEffect'): void
 }>()
 
-const selectable = computed(() => props.node.visibility === EffectVisibility.SELECTABLE)
-const active = computed(() => props.node.state?.active)
+const skillsStore = useSkillsStore()
+
+// const selectable = computed(() => props.node.visibility === EffectVisibility.SELECTABLE)
+const selectable = computed(() => props.node.selectable)
+const active = computed(() => props.node.active)
 
 function clickEffect() {
-    // // Only click if the node is selectable or active
-    // if (!selectable.value && !active.value) return;
-
     emits('clickEffect')
 }
 </script>
 
 <style scoped>
 * {
-    --local-border: hsl(var(--border));
-    --local-foreground: hsl(var(--foreground));
-    --local-background: hsl(var(--background));
-    --local-muted: hsl(var(--muted));
-    --local-muted-foreground: hsl(var(--muted-foreground));
-    --local-primary: hsl(var(--primary));
-    --local-primary-foreground: hsl(var(--primary-foreground));
-    --local-secondary: hsl(var(--secondary));
-    --local-secondary-foreground: hsl(var(--secondary-foreground));
+    --local-border: var(--border);
+    --local-foreground: var(--foreground);
+    --local-background: var(--background);
+    --local-muted: var(--muted);
+    --local-muted-foreground: var(--muted-foreground);
+    --local-primary: var(--primary);
+    --local-primary-foreground: var(--primary-foreground);
+    --local-secondary: var(--secondary);
+    --local-secondary-foreground: var(--secondary-foreground);
 }
 
 circle {

@@ -60,9 +60,9 @@
                 </DialogClose>
 
                 <TooltipProvider>
-                    <Tooltip :delayDuration="100">
+                    <Tooltip :delayDuration="100" v-if="selectable">
                         <TooltipTrigger>
-                            <Button @click="$emit('select')">
+                            <Button @click="handleSelect">
                                 <span v-if="!isAdding">
                                     <i class="ri-check-line mr-1"></i>
                                     Add
@@ -70,6 +70,16 @@
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent> There is no undo for this! </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip v-else>
+                        <TooltipTrigger>
+                            <Button disabled>
+                                <i class="ri-check-line mr-1"></i>
+                                Add
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent> You must select a parent skill first! </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </DialogFooter>
@@ -79,6 +89,8 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useSkillsStore } from './skills.store'
+import { EFFECT_INFO } from '../decisions/decisions.config'
 
 import {
     Dialog,
@@ -95,8 +107,10 @@ import { Badge } from '~/components/ui/badge'
 const props = defineProps<{
     info?: any // eslint-disable-line @typescript-eslint/no-explicit-any
     active?: boolean
+    selectable?: boolean
 }>()
 
+const skillsStore = useSkillsStore()
 const isAdding = ref<boolean>(false)
 
 const open = ref(
@@ -113,6 +127,14 @@ function close() {
     closeTimeout = setTimeout(() => {
         emits('close')
     }, 500)
+}
+
+function handleSelect() {
+    if (props.info && props.selectable) {
+        skillsStore.addSkill(props.info.key as keyof typeof EFFECT_INFO)
+        close()
+    }
+    emits('select')
 }
 
 watch(

@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Link } from '../effect.interface'
+import type { Link } from './skills.interface'
 
 defineProps<{
     link: Link
@@ -20,6 +20,6 @@ defineProps<{
 
 <style scoped>
 * {
-    --local-border: hsl(var(--border));
+    --local-border: var(--border);
 }
 </style>

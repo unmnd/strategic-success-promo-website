@@ -181,7 +181,7 @@ const priceRatio = computed(() => price.value / (props.itemPrice / 100))
 
 const { teamItems } = storeToRefs(useMarketStore())
 
-const warehouseRemainingCapacity = computed(() => 100 - teamItems.value - quantity.value)
+const warehouseRemainingCapacity = computed(() => 100 - teamItems.value)
 
 watch(
     () => warehouseRemainingCapacity.value,

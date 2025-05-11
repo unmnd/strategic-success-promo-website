@@ -22,10 +22,10 @@
                 <div class="flex flex-col font-normal items-end justify-between gap-2 h-full">
                     <!-- <UpdateTimer :last-update-timestamp="lastUpdateTimestamp" :update-interval="10000" /> -->
 
-                    <div class="text-sm text-muted-foreground">
+                    <!-- <div class="text-sm text-muted-foreground">
                         Last updated:
                         {{ new Date(lastUpdateTimestamp).toLocaleString() }}
-                    </div>
+                    </div> -->
 
                     <Popover>
                         <PopoverTrigger

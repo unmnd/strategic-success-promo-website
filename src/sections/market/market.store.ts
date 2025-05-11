@@ -144,34 +144,50 @@ export const useMarketStore = defineStore('market', () => {
             // Get the lowest available sell price
             const actualPrice = askPrice.value
 
-            // Fulfill order
-            toast.success(
-                `You have purchased ${quantity} Blue Pigment for ${formatter(actualPrice)}`,
-            )
-
-            // Set item price to the actual price
-            itemPrice.value = actualPrice
-
-            // Add to market history
-            marketPriceHistory.value.push(actualPrice)
-            marketPriceHistory.value.shift()
-
-            // Subtract one from quantity at that price market depth
+            // Find matching sell order
             const sellOrder = marketDepth.value.sell.find((sell) => sell.price === actualPrice)
             if (sellOrder) {
-                sellOrder.quantity -= quantity
+                // Calculate how many items we can actually buy
+                const availableQuantity = Math.min(quantity, sellOrder.quantity)
+                const remainingQuantity = quantity - availableQuantity
 
-                if (sellOrder.quantity == 0) {
+                // Fulfill partial order
+                toast.success(
+                    `You have purchased ${availableQuantity} Blue Pigment for ${formatter(actualPrice)}`,
+                )
+
+                // Set item price to the actual price
+                itemPrice.value = actualPrice
+
+                // Add to market history
+                marketPriceHistory.value.push(actualPrice)
+                marketPriceHistory.value.shift()
+
+                // Update sell order quantity
+                sellOrder.quantity -= availableQuantity
+
+                // Remove empty sell orders
+                if (sellOrder.quantity === 0) {
                     marketDepth.value.sell = marketDepth.value.sell.filter((sell) => sell.quantity)
                 }
+
+                // Update team items
+                teamItems.value += availableQuantity
+
+                // If there are remaining items, add them to team orders
+                if (remainingQuantity > 0) {
+                    teamOrders.value.push({
+                        maxPrice: price,
+                        quantity: remainingQuantity,
+                        buyer: 'team',
+                    })
+                }
+
+                return
             }
-
-            // Update team items
-            teamItems.value += quantity
-
-            return
         }
 
+        // If no instant match, add entire order to team orders
         teamOrders.value.push({
             maxPrice: price,
             quantity,
@@ -182,33 +198,63 @@ export const useMarketStore = defineStore('market', () => {
     function placeSellOrder(quantity: number, price: number) {
         // If sell price is lower than the current buy market depth max price, fulfill instantly
         if (price <= bidPrice.value) {
-            // Fulfill order
-            toast.success(`You have sold ${quantity} Blue Pigment for ${formatter(price)}`)
+            let remainingToSell = quantity
+            let totalSold = 0
 
-            // Set item price to the sell price
-            itemPrice.value = price
+            // Keep matching with buy orders until we sell everything or run out of matches
+            while (remainingToSell > 0) {
+                // Find next matching buy order - any buy order with price >= sell price
+                const buyOrder = marketDepth.value.buy.find((buy) => buy.price >= price)
+                if (!buyOrder) break
 
-            // Add to market history
-            marketPriceHistory.value.push(price)
-            marketPriceHistory.value.shift()
+                // Calculate how many items we can sell to this buy order
+                const availableQuantity = Math.min(remainingToSell, buyOrder.quantity)
 
-            // Subtract one from quantity at that price market depth
-            const buyOrder = marketDepth.value.buy.find((buy) => buy.price === price)
-            if (buyOrder) {
-                buyOrder.quantity -= quantity
+                // Update buy order quantity
+                buyOrder.quantity -= availableQuantity
 
-                if (buyOrder.quantity == 0) {
+                // Remove empty buy orders
+                if (buyOrder.quantity === 0) {
                     marketDepth.value.buy = marketDepth.value.buy.filter((buy) => buy.quantity)
                 }
+
+                // Update remaining quantity and total sold
+                remainingToSell -= availableQuantity
+                totalSold += availableQuantity
             }
 
-            // Update team items
-            teamItems.value -= quantity
+            // If we sold anything, update the market
+            if (totalSold > 0) {
+                // Fulfill partial order
+                toast.success(`You have sold ${totalSold} Blue Pigment for ${formatter(price)}`)
 
-            return
+                // Set item price to the sell price
+                itemPrice.value = price
+
+                // Add to market history
+                marketPriceHistory.value.push(price)
+                marketPriceHistory.value.shift()
+
+                // Update team items
+                teamItems.value -= totalSold
+
+                // If there are remaining items, add them to team orders
+                if (remainingToSell > 0) {
+                    teamOrders.value.push({
+                        items: Array(remainingToSell)
+                            .fill(null)
+                            .map(() => crypto.randomUUID()),
+                        price,
+                        quantity: remainingToSell,
+                        seller: 'team',
+                    })
+                }
+
+                return
+            }
         }
 
-        // If no instant match, add to sell orders
+        // If no instant match, add entire order to team orders
         teamOrders.value.push({
             items: Array(quantity)
                 .fill(null)
@@ -295,77 +341,121 @@ export const useMarketStore = defineStore('market', () => {
             // Random quantity between 1-10
             const orderQuantity = Math.floor(Math.random() * 10) + 1
 
-            // Add the order to market depth
+            // Check for matching team orders first
             if (orderType === 'buy') {
-                marketDepth.value.buy.push({ price: orderPrice, quantity: orderQuantity })
-
-                // Sort buy orders by price (descending)
-                marketDepth.value.buy.sort((a, b) => b.price - a.price)
-
-                // Check if any team sell orders match this buy order
+                // Find matching team sell orders
                 const matchingSellOrders = teamOrders.value.filter(
-                    (
-                        order: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-                    ) => order.seller === 'team' && order.maxPrice >= orderPrice,
+                    (order: any) => order.seller === 'team' && order.price <= orderPrice,
                 )
 
-                for (const order of matchingSellOrders) {
-                    // Fulfill the order at the actual market price
-                    const actualPrice = orderPrice
-                    toast.success(`Team sell order fulfilled at ${formatter(actualPrice)}`)
+                if (matchingSellOrders.length > 0) {
+                    // Sort by price (lowest first) to ensure best execution
+                    matchingSellOrders.sort((a: any, b: any) => a.price - b.price)
 
-                    // Update price history
-                    marketPriceHistory.value.push(actualPrice)
-                    marketPriceHistory.value.shift()
+                    let remainingToBuy = orderQuantity
+                    let totalBought = 0
 
-                    // Update item price
-                    itemPrice.value = actualPrice
+                    // Try to fulfill as many team sell orders as possible
+                    for (const sellOrder of matchingSellOrders) {
+                        if (remainingToBuy <= 0) break
 
-                    // Update team items
-                    teamItems.value -= order.quantity
+                        const availableQuantity = Math.min(remainingToBuy, sellOrder.quantity)
 
-                    // Remove the order
-                    teamOrders.value = teamOrders.value.filter(
-                        (
-                            o: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-                        ) => o !== order,
-                    )
+                        // Fulfill the order
+                        toast.success(`Team sell order fulfilled at ${formatter(sellOrder.price)}`)
+
+                        // Update price history
+                        marketPriceHistory.value.push(sellOrder.price)
+                        marketPriceHistory.value.shift()
+
+                        // Update item price
+                        itemPrice.value = sellOrder.price
+
+                        // Update team items
+                        teamItems.value -= availableQuantity
+
+                        // Update quantities
+                        remainingToBuy -= availableQuantity
+                        totalBought += availableQuantity
+                        sellOrder.quantity -= availableQuantity
+
+                        // Remove fulfilled orders
+                        if (sellOrder.quantity === 0) {
+                            teamOrders.value = teamOrders.value.filter((o: any) => o !== sellOrder)
+                        }
+                    }
+
+                    // If we couldn't fulfill the entire buy order, add remainder to market
+                    if (remainingToBuy > 0) {
+                        marketDepth.value.buy.push({ price: orderPrice, quantity: remainingToBuy })
+                        marketDepth.value.buy.sort((a, b) => b.price - a.price)
+                    }
+
+                    continue
                 }
             } else {
-                marketDepth.value.sell.push({ price: orderPrice, quantity: orderQuantity })
-
-                // Sort sell orders by price (ascending)
-                marketDepth.value.sell.sort((a, b) => a.price - b.price)
-
-                // Check if any team buy orders match this sell order
+                // Find matching team buy orders
                 const matchingBuyOrders = teamOrders.value.filter(
-                    (
-                        order: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-                    ) => order.buyer === 'team' && order.maxPrice >= orderPrice,
+                    (order: any) => order.buyer === 'team' && order.maxPrice >= orderPrice,
                 )
 
-                for (const order of matchingBuyOrders) {
-                    // Fulfill the order at the lowest available price
-                    const actualPrice = orderPrice
-                    toast.success(`Team buy order fulfilled at ${formatter(actualPrice)}`)
+                if (matchingBuyOrders.length > 0) {
+                    // Sort by max price (highest first) to ensure best execution
+                    matchingBuyOrders.sort((a: any, b: any) => b.maxPrice - a.maxPrice)
 
-                    // Update price history
-                    marketPriceHistory.value.push(actualPrice)
-                    marketPriceHistory.value.shift()
+                    let remainingToSell = orderQuantity
+                    let totalSold = 0
 
-                    // Update item price
-                    itemPrice.value = actualPrice
+                    // Try to fulfill as many team buy orders as possible
+                    for (const buyOrder of matchingBuyOrders) {
+                        if (remainingToSell <= 0) break
 
-                    // Update team items
-                    teamItems.value += order.quantity
+                        const availableQuantity = Math.min(remainingToSell, buyOrder.quantity)
 
-                    // Remove the order
-                    teamOrders.value = teamOrders.value.filter(
-                        (
-                            o: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-                        ) => o !== order,
-                    )
+                        // Fulfill the order
+                        toast.success(`Team buy order fulfilled at ${formatter(orderPrice)}`)
+
+                        // Update price history
+                        marketPriceHistory.value.push(orderPrice)
+                        marketPriceHistory.value.shift()
+
+                        // Update item price
+                        itemPrice.value = orderPrice
+
+                        // Update team items
+                        teamItems.value += availableQuantity
+
+                        // Update quantities
+                        remainingToSell -= availableQuantity
+                        totalSold += availableQuantity
+                        buyOrder.quantity -= availableQuantity
+
+                        // Remove fulfilled orders
+                        if (buyOrder.quantity === 0) {
+                            teamOrders.value = teamOrders.value.filter((o: any) => o !== buyOrder)
+                        }
+                    }
+
+                    // If we couldn't fulfill the entire sell order, add remainder to market
+                    if (remainingToSell > 0) {
+                        marketDepth.value.sell.push({
+                            price: orderPrice,
+                            quantity: remainingToSell,
+                        })
+                        marketDepth.value.sell.sort((a, b) => a.price - b.price)
+                    }
+
+                    continue
                 }
+            }
+
+            // If no team orders were fulfilled, add to market depth
+            if (orderType === 'buy') {
+                marketDepth.value.buy.push({ price: orderPrice, quantity: orderQuantity })
+                marketDepth.value.buy.sort((a, b) => b.price - a.price)
+            } else {
+                marketDepth.value.sell.push({ price: orderPrice, quantity: orderQuantity })
+                marketDepth.value.sell.sort((a, b) => a.price - b.price)
             }
 
             // If this transaction filled a gap between buy and sell, it's executed immediately

@@ -1,79 +1,72 @@
 <template>
-    <Card class="w-full">
-        <CardHeader class="flex flex-row justify-between">
-            <CardTitle>Skills</CardTitle>
+    <Card class="w-full relative p-0">
+        <div ref="chart" class="w-full h-full">
+            <svg
+                :viewBox="viewBox"
+                preserve-aspect-ratio="none"
+                width="100%"
+                ref="svg"
+                class="relative overflow-clip h-[32rem]"
+            >
+                <g class="relative" :transform="zoomTransform ? zoomTransform.toString() : ''">
+                    <SkillTreeLink v-for="(link, idx) in links" :key="idx" :link="link" />
 
-            <SkillTreePoints />
-        </CardHeader>
+                    <SkillTreeNode
+                        v-for="node in nodes"
+                        :key="node.id"
+                        :node="node"
+                        @clickEffect="infoNode = node"
+                    />
+                </g>
+            </svg>
 
-        <CardContent>
-            <div ref="chart" class="w-full h-full">
-                <!-- :width="width"
-        :height="height" -->
-                <svg
-                    :viewBox="viewBox"
-                    preserve-aspect-ratio="none"
-                    width="100%"
-                    ref="svg"
-                    class="relative overflow-clip h-[32rem]"
-                >
-                    <g class="relative" :transform="zoomTransform ? zoomTransform.toString() : ''">
-                        <SkillTreeLink v-for="(link, idx) in links" :key="idx" :link="link" />
-
-                        <SkillTreeNode
-                            v-for="node in nodes"
-                            :key="node.id"
-                            :node="node"
-                            @clickEffect="infoNode = node"
-                        />
-                    </g>
-                </svg>
-
-                <EffectInfo
-                    :info="infoNode?.info"
-                    :active="infoNode?.state?.active"
-                    :visibility="infoNode?.visibility"
-                    @close="infoNode = undefined"
-                />
-            </div>
-        </CardContent>
+            <EffectInfo
+                :info="infoNode?.info"
+                :active="infoNode?.active"
+                :selectable="infoNode?.selectable"
+                @close="infoNode = undefined"
+            />
+        </div>
     </Card>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import * as d3 from 'd3'
+import { storeToRefs } from 'pinia'
 
 import SkillTreeNode from './SkillTreeNode.vue'
 import SkillTreeLink from './SkillTreeLink.vue'
-import EffectInfo from '../decisions/EffectInfo.vue'
-import SkillTreePoints from './SkillTreePoints.vue'
 
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import { EFFECT_INFO } from '../decisions/decisions.config'
 import {
     SKILL_TREE_CHARGE_FORCE,
     SKILL_TREE_LINK_LENGTH,
     SKILL_TREE_LINK_STRENGTH,
-} from '~/modules/team/modules/effect/effect.config'
-import { useTeamStore } from '~/modules/team/team.store'
-import { useEffectStore } from '~/modules/team/modules/effect/effect.store'
+    type Link,
+    type Node,
+} from './skills.interface'
+import { useSkillsStore } from './skills.store'
+import EffectInfo from './EffectInfo.vue'
+// import {
+//     SKILL_TREE_CHARGE_FORCE,
+//     SKILL_TREE_LINK_LENGTH,
+//     SKILL_TREE_LINK_STRENGTH,
+// } from '~/modules/team/modules/effect/effect.config'
+// import { useTeamStore } from '~/modules/team/team.store'
+// import { useEffectStore } from '~/modules/team/modules/effect/effect.store'
 
-const teamStore = (await useTeamStore)()
-const effectStore = (await useEffectStore)()
+const skillsStore = useSkillsStore()
+// const { links } = storeToRefs(skillsStore)
 
-const chart = ref<HTMLDivElement | null>(null)
-const svg = ref<SVGSVGElementZoom | null>(null)
-
-const width = 100
-const height = 680
-const viewBox = [-width / 2, -height / 2, width, height].join(' ')
-
-const nodes = ref<Node[]>(JSON.parse(JSON.stringify(effectStore.nodes)))
+const nodes = ref<Node[]>(JSON.parse(JSON.stringify(skillsStore.nodes)))
 const links = computed<Link[]>(() => {
     const links: Link[] = []
 
     for (const node of nodes.value) {
-        const siblings = node.info.siblings
+        if (node.info.type !== 'skill') continue
+        const siblings = node.info.siblings ?? []
 
         for (const sibling of siblings) {
             // If the link already exists, skip
@@ -100,6 +93,26 @@ const links = computed<Link[]>(() => {
     return links
 })
 
+const chart = ref<HTMLDivElement | null>(null)
+const svg = ref<SVGSVGElement | null>(null)
+
+const width = 100
+const height = 680
+// const viewBox = [500, -height / 2, width, height].join(' ')
+const viewBox = ref([800, -400, width, height].join(' '))
+
+// const nodes = computed<Node[]>(() => {
+//     return Object.entries(EFFECT_INFO)
+//         .filter(([_key, info]) => info.type === 'skill')
+//         .map(([key, info]) => {
+//             return {
+//                 id: key,
+//                 info,
+//                 active: skills.value.includes(key as keyof typeof EFFECT_INFO),
+//             }
+//         })
+// })
+
 const zoomTransform = ref<d3.ZoomTransform | undefined>(undefined)
 
 const infoNode = ref<Node | undefined>(undefined)
@@ -109,6 +122,9 @@ onMounted(() => {
 
     // Get actual width of the chart
     const { width, height } = chart.value!.getBoundingClientRect()
+
+    // Update the viewBox
+    // viewBox.value = [100, 0, width, height].join(' ')
 
     // const simulation =
     const simulation = d3
@@ -121,7 +137,7 @@ onMounted(() => {
                 .distance(SKILL_TREE_LINK_LENGTH)
                 .strength(SKILL_TREE_LINK_STRENGTH),
         )
-        .force('center', d3.forceCenter(-width, -height / 2))
+        .force('center', d3.forceCenter(-width / 2, -height))
         .force(
             'charge',
             d3.forceManyBody().strength(SKILL_TREE_CHARGE_FORCE),
@@ -152,7 +168,7 @@ onMounted(() => {
     //     );
 
     watch(
-        () => effectStore.nodes,
+        () => skillsStore.nodes,
         (newValue) => {
             let needsRefresh = false
 
@@ -163,8 +179,8 @@ onMounted(() => {
                 if (existingNode) {
                     // Update the existing node
                     Object.assign(existingNode, {
-                        state: newNode.state,
-                        visibility: newNode.visibility,
+                        active: newNode.active,
+                        selectable: newNode.selectable,
                     })
                 } else {
                     // Add the new node
@@ -183,9 +199,6 @@ onMounted(() => {
 
             // Only refresh the sim if the length of the nodes array has changed
             if (needsRefresh) refreshSimulation()
-
-            // Skill points might have changed
-            teamStore.updateTeamStats()
         },
         {
             deep: true,
@@ -196,8 +209,8 @@ onMounted(() => {
         const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0, 1]).on('zoom', zoomed)
         d3.select(svg.value).call(zoom as any) // eslint-disable-line @typescript-eslint/no-explicit-any
 
-        // Assign the D3 zoom behavior to the ref for later use
-        svg.value.__zoomBehavior = zoom
+        // Store zoom behavior in a separate ref
+        const zoomBehavior = ref(zoom)
     }
 
     onUnmounted(() => {
