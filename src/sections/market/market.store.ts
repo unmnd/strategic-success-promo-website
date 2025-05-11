@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { defineStore } from 'pinia'
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { formatter, toast } from '~/utils'
@@ -95,7 +97,6 @@ export const useMarketStore = defineStore('market', () => {
 
     const lastPrice = computed(() => marketPriceHistory.value[0])
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const teamOrders = ref<any>([
         {
             _id: 'b2d170ff-a5c6-4e47-8aa7-fe5a08f43fea',
@@ -353,7 +354,6 @@ export const useMarketStore = defineStore('market', () => {
                     matchingSellOrders.sort((a: any, b: any) => a.price - b.price)
 
                     let remainingToBuy = orderQuantity
-                    let totalBought = 0
 
                     // Try to fulfill as many team sell orders as possible
                     for (const sellOrder of matchingSellOrders) {
@@ -376,7 +376,6 @@ export const useMarketStore = defineStore('market', () => {
 
                         // Update quantities
                         remainingToBuy -= availableQuantity
-                        totalBought += availableQuantity
                         sellOrder.quantity -= availableQuantity
 
                         // Remove fulfilled orders
@@ -404,7 +403,6 @@ export const useMarketStore = defineStore('market', () => {
                     matchingBuyOrders.sort((a: any, b: any) => b.maxPrice - a.maxPrice)
 
                     let remainingToSell = orderQuantity
-                    let totalSold = 0
 
                     // Try to fulfill as many team buy orders as possible
                     for (const buyOrder of matchingBuyOrders) {
@@ -427,7 +425,6 @@ export const useMarketStore = defineStore('market', () => {
 
                         // Update quantities
                         remainingToSell -= availableQuantity
-                        totalSold += availableQuantity
                         buyOrder.quantity -= availableQuantity
 
                         // Remove fulfilled orders

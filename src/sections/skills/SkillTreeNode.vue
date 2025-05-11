@@ -27,10 +27,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { SKILL_TREE_NODE_RADIUS, type Node } from './skills.interface'
-import { useSkillsStore } from './skills.store'
-import { EFFECT_INFO } from '../decisions/decisions.config'
 
 // import { SKILL_TREE_NODE_RADIUS } from '~/modules/team/modules/effect/effect.config'
 // import { EffectVisibility } from '@/game/effect/effect.interface.enum'
@@ -42,8 +40,6 @@ const props = defineProps<{
 const emits = defineEmits<{
     (e: 'clickEffect'): void
 }>()
-
-const skillsStore = useSkillsStore()
 
 // const selectable = computed(() => props.node.visibility === EffectVisibility.SELECTABLE)
 const selectable = computed(() => props.node.selectable)

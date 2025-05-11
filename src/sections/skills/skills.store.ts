@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { EFFECT_INFO } from '../decisions/decisions.config'
-import type { Link, Node } from './skills.interface'
+import type { Node } from './skills.interface'
 import { toast } from '~/utils'
 
 export const useSkillsStore = defineStore('skills', () => {

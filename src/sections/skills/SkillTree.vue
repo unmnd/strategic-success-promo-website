@@ -33,13 +33,11 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import * as d3 from 'd3'
-import { storeToRefs } from 'pinia'
 
 import SkillTreeNode from './SkillTreeNode.vue'
 import SkillTreeLink from './SkillTreeLink.vue'
 
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
-import { EFFECT_INFO } from '../decisions/decisions.config'
+import { Card } from '~/components/ui/card'
 import {
     SKILL_TREE_CHARGE_FORCE,
     SKILL_TREE_LINK_LENGTH,
@@ -49,16 +47,8 @@ import {
 } from './skills.interface'
 import { useSkillsStore } from './skills.store'
 import EffectInfo from './EffectInfo.vue'
-// import {
-//     SKILL_TREE_CHARGE_FORCE,
-//     SKILL_TREE_LINK_LENGTH,
-//     SKILL_TREE_LINK_STRENGTH,
-// } from '~/modules/team/modules/effect/effect.config'
-// import { useTeamStore } from '~/modules/team/team.store'
-// import { useEffectStore } from '~/modules/team/modules/effect/effect.store'
 
 const skillsStore = useSkillsStore()
-// const { links } = storeToRefs(skillsStore)
 
 const nodes = ref<Node[]>(JSON.parse(JSON.stringify(skillsStore.nodes)))
 const links = computed<Link[]>(() => {
@@ -98,20 +88,7 @@ const svg = ref<SVGSVGElement | null>(null)
 
 const width = 100
 const height = 680
-// const viewBox = [500, -height / 2, width, height].join(' ')
 const viewBox = ref([800, -400, width, height].join(' '))
-
-// const nodes = computed<Node[]>(() => {
-//     return Object.entries(EFFECT_INFO)
-//         .filter(([_key, info]) => info.type === 'skill')
-//         .map(([key, info]) => {
-//             return {
-//                 id: key,
-//                 info,
-//                 active: skills.value.includes(key as keyof typeof EFFECT_INFO),
-//             }
-//         })
-// })
 
 const zoomTransform = ref<d3.ZoomTransform | undefined>(undefined)
 
@@ -133,7 +110,11 @@ onMounted(() => {
             'link',
             d3
                 .forceLink(links.value)
-                .id((d: any) => d.id)
+                .id(
+                    (
+                        d: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+                    ) => d.id,
+                )
                 .distance(SKILL_TREE_LINK_LENGTH)
                 .strength(SKILL_TREE_LINK_STRENGTH),
         )
@@ -156,16 +137,6 @@ onMounted(() => {
         ;(simulation.force('link') as d3.ForceLink<Node, Link>).links(links.value)
         simulation.alpha(1).restart()
     }
-
-    //     watch(
-    //         () => nodes.value.length,
-    //         () => {
-    //             refreshSimulation();
-    //
-    //             // Skill points might have changed
-    //             teamStore.updateTeamStats();
-    //         },
-    //     );
 
     watch(
         () => skillsStore.nodes,
@@ -208,9 +179,6 @@ onMounted(() => {
     if (svg.value) {
         const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0, 1]).on('zoom', zoomed)
         d3.select(svg.value).call(zoom as any) // eslint-disable-line @typescript-eslint/no-explicit-any
-
-        // Store zoom behavior in a separate ref
-        const zoomBehavior = ref(zoom)
     }
 
     onUnmounted(() => {
@@ -221,47 +189,9 @@ onMounted(() => {
 })
 
 // Function to handle zoom event
-function zoomed(event: d3.D3ZoomEvent<any, any>) {
+function zoomed(
+    event: d3.D3ZoomEvent<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+) {
     zoomTransform.value = event.transform
 }
-
-// Function to handle node dragging
-// function startDrag(node: Node) {
-//     if (svg.value) {
-//         // Disable zooming when starting to drag
-//         d3.select(svg.value).on('.zoom', null);
-//     }
-//
-//     function dragged(event: d3.D3DragEvent<SVGCircleElement, unknown, SVGSVGElement>) {
-//         if (state.zoomTransform && svg.value) {
-//             const point = d3.pointer(event, svg.value); // Get the mouse position in the SVG coordinate system
-//             const inverted = state.zoomTransform.invert(point); // Invert the current zoom transform
-//
-//             node.fx = inverted[0];
-//             node.fy = inverted[1];
-//         } else {
-//             node.fx = event.x;
-//             node.fy = event.y;
-//         }
-//     }
-//
-//     function ended() {
-//         node.fx = null;
-//         node.fy = null;
-//         simulation.alphaTarget(0);
-//
-//         document.removeEventListener('mousemove', dragged);
-//         document.removeEventListener('mouseup', ended);
-//
-//         // Re-enable zooming when finished dragging
-//         if (svg.value && svg.value.__zoomBehavior) {
-//             d3.select(svg.value).call(svg.value.__zoomBehavior as any);
-//         }
-//     }
-//
-//     simulation.alphaTarget(0.3).restart();
-//
-//     document.addEventListener('mousemove', dragged);
-//     document.addEventListener('mouseup', ended);
-// }
 </script>

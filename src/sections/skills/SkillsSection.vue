@@ -21,7 +21,7 @@
                 </div>
             </div>
 
-            <div ref="skills" class="basis-2/3">
+            <div ref="skills" class="basis-2/3 max-w-3xl">
                 <SkillTree />
             </div>
         </div>

@@ -8,6 +8,7 @@ import MarketSection from '../sections/market/MarketSection.vue'
 import darkGeneric from '~/assets/backgrounds/dark_generic.jpg'
 import corporateGeneric from '~/assets/backgrounds/corporate_generic.jpg'
 import finance from '~/assets/backgrounds/finance.jpg'
+import BankSection from '~/sections/bank/BankSection.vue'
 
 // Define all sections and their components in a single place
 export const SECTIONS = [
@@ -34,6 +35,11 @@ export const SECTIONS = [
     {
         id: 'market',
         component: MarketSection,
+        background: finance,
+    },
+    {
+        id: 'base',
+        component: BankSection,
         background: finance,
     },
 ] as const
