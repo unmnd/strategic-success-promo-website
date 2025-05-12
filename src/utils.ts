@@ -95,4 +95,8 @@ export function colouredIcon(colour: string, icon: string) {
           </span>`
 }
 
+export function icon(icon: string) {
+    return ` <i class="${icon}"></i>`
+}
+
 export { toast } from 'vue-sonner'
