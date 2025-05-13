@@ -38,14 +38,16 @@ const p2 = ref<HTMLElement | null>(null)
 const p3 = ref<HTMLElement | null>(null)
 
 onMounted(() => {
-    // Animate text elements on scroll
-    animate([text.value!, p1.value!, p2.value!, p3.value!], {
-        ...fx.fadeUp,
-        autoplay: onScroll({
-            enter: '50% top',
-            leave: '0 top',
-            sync: 0.2,
-        }),
+    const elements = [text.value!, p1.value!, p2.value!, p3.value!]
+    elements.forEach((el, i) => {
+        animate(el, {
+            ...fx.fadeUp,
+            autoplay: onScroll({
+                enter: '70% top',
+                leave: '0 top',
+                sync: 0.2,
+            }),
+        })
     })
 })
 </script>

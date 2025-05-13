@@ -1,7 +1,7 @@
 <template>
     <div ref="container" class="w-screen min-h-screen flex items-center gap-16 px-8">
-        <div class="pt-20 pb-8 max-w-3xl text-center" ref="text">
-            <h1 class="text-2xl font-bold pb-4">
+        <div class="pt-20 pb-8 max-w-3xl text-center">
+            <h1 ref="title" class="text-2xl font-bold pb-4">
                 <i class="ri-store-2-fill"></i>
                 Warehouse
             </h1>
@@ -31,20 +31,22 @@ import Warehouse from './components/Warehouse.vue'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
 
 const { element: container } = useIntersectionObserver('warehouse')
-const text = ref<HTMLElement | null>(null)
+const title = ref<HTMLElement | null>(null)
 const p1 = ref<HTMLElement | null>(null)
 const p2 = ref<HTMLElement | null>(null)
 const p3 = ref<HTMLElement | null>(null)
 
 onMounted(() => {
-    // Animate text elements on scroll
-    animate([text.value!, p1.value!, p2.value!, p3.value!], {
-        ...fx.fadeUp,
-        autoplay: onScroll({
-            enter: '50% top',
-            leave: '0 top',
-            sync: 0.2,
-        }),
+    const elements = [title.value!, p1.value!, p2.value!, p3.value!]
+    elements.forEach((el, i) => {
+        animate(el, {
+            ...fx.fadeUp,
+            autoplay: onScroll({
+                enter: '70% top',
+                leave: '0 top',
+                sync: 0.2,
+            }),
+        })
     })
 })
 </script>

@@ -1,10 +1,10 @@
-import IntroSection from '../sections/intro/IntroSection.vue'
-import InteractivityNote from '../sections/intro/InteractivityNote.vue'
-import DecisionsSection from '../sections/decisions/DecisionsSection.vue'
-import SkillsSection from '../sections/skills/SkillsSection.vue'
-import MarketSection from '../sections/market/MarketSection.vue'
-import WarehouseSection from '../sections/warehouse/WarehouseSection.vue'
-import BankSection from '~/sections/bank/BankSection.vue'
+// import IntroSection from '../sections/intro/IntroSection.vue'
+// import InteractivityNote from '../sections/intro/InteractivityNote.vue'
+// import DecisionsSection from '../sections/decisions/DecisionsSection.vue'
+// import SkillsSection from '../sections/skills/SkillsSection.vue'
+// import MarketSection from '../sections/market/MarketSection.vue'
+// import WarehouseSection from '../sections/warehouse/WarehouseSection.vue'
+// import BankSection from '~/sections/bank/BankSection.vue'
 
 // Import backgrounds
 import darkGeneric from '~/assets/backgrounds/dark_generic.jpg'
@@ -16,37 +16,37 @@ import warehouse from '~/assets/backgrounds/warehouse.jpg'
 export const SECTIONS = [
     {
         id: 'intro',
-        component: IntroSection,
+        // component: IntroSection,
         background: null, // No background for intro
     },
     {
         id: 'interactivity',
-        component: InteractivityNote,
+        // component: InteractivityNote,
         background: null, // No background for interactivity note
     },
     {
         id: 'decisions',
-        component: DecisionsSection,
+        // component: DecisionsSection,
         background: darkGeneric,
     },
     {
         id: 'skills',
-        component: SkillsSection,
+        // component: SkillsSection,
         background: corporateGeneric,
     },
     {
         id: 'market',
-        component: MarketSection,
+        // component: MarketSection,
         background: finance,
     },
     {
         id: 'warehouse',
-        component: WarehouseSection,
+        // component: WarehouseSection,
         background: warehouse,
     },
     {
         id: 'bank',
-        component: BankSection,
+        // component: BankSection,
         background: finance,
     },
 ] as const
