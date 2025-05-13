@@ -44,42 +44,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref } from 'vue'
-
-import { toast } from 'vue-sonner'
+import { computed } from 'vue'
 
 import EffectInfo from './EffectInfo.vue'
 
 import { Card, CardContent } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { EFFECT_INFO } from './decisions.config'
+import { useDecisionsStore } from './decisions.store'
+import { storeToRefs } from 'pinia'
 
-const decisions = ref<(keyof typeof EFFECT_INFO)[]>([
-    'tradeShowPositiveReputation',
-    'newYearMarketingCampaign',
-    'staffPayRise',
-])
+const decisionStore = useDecisionsStore()
 
-const timer = setTimeout(() => {
-    decisions.value.push('expandWarehouse')
-    toast.info('New Decision Available', {
-        description: 'Warehouse Expansion Oppourtunity',
-    })
-}, 5000)
+const { selectDecision } = decisionStore
+const { decisions, selectedEffect } = storeToRefs(decisionStore)
 
-onUnmounted(() => {
-    clearTimeout(timer)
-})
-
-function selectDecision() {
-    decisions.value = decisions.value.filter((el) => el !== selectedEffect.value)
-    toast.success('Decision Added', {
-        description: EFFECT_INFO[selectedEffect.value!].name,
-    })
-    selectedEffect.value = undefined
-}
-
-const selectedEffect = ref<keyof typeof EFFECT_INFO | undefined>()
 const selectedEffectInfo = computed(() =>
     selectedEffect.value ? EFFECT_INFO[selectedEffect.value] : undefined,
 )

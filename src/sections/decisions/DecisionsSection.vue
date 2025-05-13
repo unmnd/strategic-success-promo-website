@@ -31,15 +31,19 @@ import { onMounted, ref } from 'vue'
 import { fx } from '~/utils'
 import { animate, onScroll } from 'animejs'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
+import { useDecisionsStore } from './decisions.store'
 
 const { element: container } = useIntersectionObserver('decisions')
+const decisions = ref<HTMLElement | null>(null)
 const text = ref<HTMLElement | null>(null)
 const p1 = ref<HTMLElement | null>(null)
 const p2 = ref<HTMLElement | null>(null)
 
+const decisionsStore = useDecisionsStore()
+
 onMounted(() => {
     const elements = [text.value!, p1.value!, p2.value!]
-    elements.forEach((el, i) => {
+    for (const el of elements) {
         animate(el, {
             ...fx.fadeUp,
             autoplay: onScroll({
@@ -48,6 +52,17 @@ onMounted(() => {
                 sync: 0.2,
             }),
         })
+    }
+
+    animate(decisions.value!, {
+        autoplay: onScroll({}),
+        onBegin: () => {
+            if (decisionsStore.decisions.includes('expandWarehouse')) return
+
+            setTimeout(() => {
+                decisionsStore.addDecision('expandWarehouse')
+            }, 3000)
+        },
     })
 })
 </script>

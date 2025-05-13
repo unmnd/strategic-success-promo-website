@@ -38,7 +38,7 @@ const p3 = ref<HTMLElement | null>(null)
 
 onMounted(() => {
     const elements = [title.value!, p1.value!, p2.value!, p3.value!]
-    elements.forEach((el, i) => {
+    for (const el of elements) {
         animate(el, {
             ...fx.fadeUp,
             autoplay: onScroll({
@@ -47,7 +47,7 @@ onMounted(() => {
                 sync: 0.2,
             }),
         })
-    })
+    }
 })
 </script>
 
