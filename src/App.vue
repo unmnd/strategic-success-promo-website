@@ -1,25 +1,27 @@
 <template>
-    <div ref="main" class="w-screen h-screen overflow-hidden hidden lg:block">
+    <div ref="main" class="hidden lg:block">
         <Toaster />
 
         <!-- Global Background -->
         <Background />
 
+        <IntroSection />
+        <InteractivityNote />
+        <DecisionsSection />
+        <SkillsSection />
+        <MarketSection />
+        <WarehouseSection />
+        <BankSection />
+
         <!-- Scroll Prompt -->
         <!-- <ScrollPrompt /> -->
 
         <!-- Router View for Sections -->
-        <router-view v-slot="{ Component, route }">
+        <!-- <router-view v-slot="{ Component, route }">
             <Transition @enter="handleEnter" @leave="handleLeave" mode="out-in" :css="false">
                 <component :is="Component" :key="route.path" />
             </Transition>
-        </router-view>
-
-        <!-- Debug button to change sections -->
-        <Button class="fixed bottom-4 right-4" @click="goToPreviousSection"
-            >Previous Section</Button
-        >
-        <Button class="fixed bottom-4 right-4" @click="goToNextSection">Next Section</Button>
+        </router-view> -->
     </div>
 
     <div class="lg:hidden">
@@ -34,21 +36,17 @@
 // import ScrollPrompt from './components/ScrollPrompt.vue'
 import Background from './components/Background.vue'
 import { useColorMode } from '@vueuse/core'
-import { goToNextSection, goToPreviousSection } from './router'
-import { Button } from './components/ui/button'
-import { animate } from 'animejs'
-import { fx } from './utils'
+
 import { Toaster } from './components/ui/sonner'
+import IntroSection from './sections/intro/IntroSection.vue'
+import InteractivityNote from './sections/intro/InteractivityNote.vue'
+import DecisionsSection from './sections/decisions/DecisionsSection.vue'
+import SkillsSection from './sections/skills/SkillsSection.vue'
+import MarketSection from './sections/market/MarketSection.vue'
+import WarehouseSection from './sections/warehouse/WarehouseSection.vue'
+import BankSection from './sections/bank/BankSection.vue'
 
 useColorMode()
-
-function handleEnter(el: Element, done: () => void) {
-    animate(el, { ...fx.fadeUp, onComplete: done })
-}
-
-function handleLeave(el: Element, done: () => void) {
-    animate(el, { ...fx.fadeUpOut, onComplete: done })
-}
 </script>
 
 <style scoped></style>

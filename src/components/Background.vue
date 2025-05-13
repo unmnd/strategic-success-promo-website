@@ -3,9 +3,9 @@
         ref="image"
         v-show="src"
         :src="src || undefined"
-        class="fixed inset-0 object-cover w-screen h-screen"
+        class="fixed inset-0 object-cover w-screen h-screen z-[-1]"
     />
-    <div ref="black" class="fixed inset-0 bg-background"></div>
+    <div ref="black" class="fixed inset-0 bg-background z-[-1]"></div>
 </template>
 
 <script setup lang="ts">

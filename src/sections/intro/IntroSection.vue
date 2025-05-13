@@ -1,7 +1,7 @@
 <template>
     <div
         ref="container"
-        class="fixed top-0 w-full flex flex-col items-center justify-center h-screen text-center"
+        class="w-screen h-screen flex flex-col items-center justify-center text-center"
     >
         <div ref="logo" class="opacity-0">
             <Logo />
@@ -21,8 +21,10 @@ import { ref, onMounted } from 'vue'
 import Logo from '~/components/MainLogo.vue'
 import { fx } from '~/utils'
 import { createTimeline } from 'animejs'
+import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
 
-const container = ref<HTMLElement | null>(null)
+const { element: container } = useIntersectionObserver('intro')
+
 const logo = ref<HTMLElement | null>(null)
 const word1 = ref<HTMLElement | null>(null)
 const word2 = ref<HTMLElement | null>(null)
