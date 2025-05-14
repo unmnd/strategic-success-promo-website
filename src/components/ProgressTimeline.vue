@@ -1,13 +1,14 @@
 <template>
     <div
         ref="container"
-        class="-translate-x-[100%] h-screen w-full flex flex-col gap-4 justify-center select-none"
+        class="flex flex-col gap-4 py-4 h-screen w-full select-none text-sm relative"
+        :style="{ transform: `translateX(${xTranslation}%)` }"
     >
         <div
             v-for="section in filteredSections"
             :key="section"
             :ref="(el) => setSectionRef(el as HTMLElement | null, section)"
-            class="transition uppercase text-end pr-2 [writing-mode:vertical-lr] hover:opacity-100 hover:translate-x-0 -translate-x-2 pl-2"
+            class="transition uppercase text-end pr-2 [writing-mode:vertical-lr] pl-2"
             :class="{
                 'opacity-20': section !== activeSectionStore.activeSectionId,
                 'opacity-100 border-r font-bold': section === activeSectionStore.activeSectionId,
@@ -20,12 +21,13 @@
 </template>
 
 <script setup lang="ts">
-import { SECTIONS } from '~/config/stage.config'
+import { MAIN_SECTION_IDS } from '~/config/stage.config'
 import { useActiveSectionStore } from '~/stores/activeSection'
 import { onMounted, ref, watch, inject } from 'vue'
-import { animate, createAnimatable } from 'animejs'
+import { animate } from 'animejs'
 
 const container = ref<HTMLElement | null>(null)
+const xTranslation = ref(-100)
 
 const activeSectionStore = useActiveSectionStore()
 const sectionRefs = ref<Record<string, HTMLElement | null>>({})
@@ -36,9 +38,7 @@ interface AppInstance {
 
 const app = inject<AppInstance>('app')
 
-const filteredSections = SECTIONS.map((el) => el.id).filter(
-    (el) => !['intro', 'interactivity'].includes(el),
-)
+const filteredSections = MAIN_SECTION_IDS
 
 const setSectionRef = (el: HTMLElement | null, id: string) => {
     sectionRefs.value[id] = el
@@ -54,53 +54,81 @@ const handleSectionClick = (section: string) => {
 }
 
 onMounted(() => {
-    const animatables = Object.entries(sectionRefs.value).reduce(
-        (acc, [id, el]) => {
+    // Store original positions when mounted
+    const originalPositions = ref<Record<string, number>>({})
+
+    // Calculate and store original positions
+    const calculateOriginalPositions = () => {
+        const sections = Object.entries(sectionRefs.value)
+        let currentPosition = 0
+
+        sections.forEach(([id, el]) => {
             if (el) {
-                acc[id] = createAnimatable(el, {
-                    height: '64px',
-                    ease: 'outExpo',
-                    duration: 800,
-                })
+                originalPositions.value[id] = currentPosition
+                currentPosition += el.offsetHeight + 16 // 16px for gap
             }
-            return acc
-        },
-        {} as Record<string, ReturnType<typeof createAnimatable>>,
-    )
+        })
+    }
+
+    // Calculate positions after a short delay to ensure all elements are rendered
+    setTimeout(calculateOriginalPositions, 100)
 
     watch(
         () => activeSectionStore.activeSectionId,
         (newId) => {
-            // If the sectionID is anything but intro, animate the container in
-            animate(
-                container.value!,
-                newId === 'intro'
-                    ? {
-                          translateX: ['-100%'],
-                          opacity: 0,
-                          ease: 'inExpo',
-                          duration: 1000,
-                      }
-                    : {
-                          translateX: ['100%'],
-                          opacity: 1,
-                          ease: 'outExpo',
-                          duration: 2000,
-                      },
-            )
+            if (!container.value || !newId) return
 
-            if (newId) {
-                Object.entries(animatables).forEach(([id, animatable]) => {
-                    if (id === newId) {
-                        animatable.height(320)
-                    } else {
-                        animatable.height(64)
-                    }
+            // Animate x translation
+            if (newId === 'intro') {
+                animate(container.value, {
+                    translateX: -100,
+                    ease: 'inExpo',
+                    duration: 500,
+                })
+            } else {
+                animate(container.value, {
+                    translateX: 0,
+                    ease: 'outExpo',
+                    duration: 2000,
                 })
             }
+
+            const containerHeight = container.value.offsetHeight
+            const activeSectionEl = sectionRefs.value[newId]
+
+            // if (activeSectionEl) {
+            // Use the stored original position
+            const originalPosition = originalPositions.value[newId] || 0
+            const sectionHeight = activeSectionEl?.offsetHeight || 0
+
+            // Calculate target scroll position
+            const targetScroll = originalPosition - containerHeight / 2 + sectionHeight / 2
+
+            // Animate the container to center the active section
+            animate(container.value, {
+                translateY: -targetScroll,
+                ease: 'outExpo',
+                duration: 1000,
+            })
+
+            // Animate the active section
+            Object.entries(sectionRefs.value).forEach(([id, el]) => {
+                if (el) {
+                    animate(el, {
+                        paddingBottom: id === newId ? '8rem' : '0',
+                        ease: 'outExpo',
+                        duration: 800,
+                    })
+                }
+            })
         },
     )
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.container {
+    position: relative;
+    transition: transform 0.3s ease;
+}
+</style>

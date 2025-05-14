@@ -44,12 +44,7 @@
                 </TableCell>
 
                 <TableCell class="text-right">
-                    {{
-                        formatter(
-                            warehouseStore.itemCounts[key as keyof typeof warehouseStore.itemCounts]
-                                .averageCost,
-                        )
-                    }}
+                    {{ formatter(warehouseStore.itemCounts[key as string].averageCost) }}
                 </TableCell>
 
                 <TableCell class="text-2xl text-right font-extrabold">
@@ -85,7 +80,8 @@ import {
 } from '~/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
 import { formatter } from '~/utils'
-import { useWarehouseStore, ITEM_DEFINITIONS } from '../warehouse.store'
+import { useWarehouseStore } from '../warehouse.store'
+import { ITEM_DEFINITIONS } from '~/sections/manufacturing/manufacturing.config'
 
 const warehouseStore = useWarehouseStore()
 

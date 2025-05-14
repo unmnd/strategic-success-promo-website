@@ -2,29 +2,29 @@
     <div ref="container" class="w-full flex flex-col items-center">
         <div class="pt-20 pb-8 max-w-3xl text-center" ref="text">
             <h1 class="text-2xl font-bold pb-4">
-                <i class="ri-line-chart-fill"></i>
-                Market
+                <i class="ri-exchange-funds-fill"></i>
+                Trade
             </h1>
             <div class="space-y-4">
-                <p ref="p1">A living, breathing economy.</p>
+                <p ref="p1">Negotiate your way to the top.</p>
 
                 <p ref="p2">
-                    Prices of raw materials and products shift organically based on
-                    <b>team activity</b> and <b>external news</b>. Supply and demand are king.
+                    Teams can trade <b>commodities</b>, <b>products</b>, and <b>cash</b> directly
+                    with each other.
                 </p>
 
                 <p ref="p3">
-                    From pandemics to political instability—reacting to <b>market shocks</b> is part
-                    of the game.
+                    Drive a hard bargain, broker deals, or build alliances—it's all part of the
+                    strategy.
                 </p>
             </div>
         </div>
 
         <div
-            ref="market"
+            ref="trade"
             class="w-full max-w-6xl flex items-center justify-center p-4 mb-8 bg-card rounded-xl border"
         >
-            <MarketItemInfo />
+            <!-- Placeholder for future trade component -->
         </div>
     </div>
 </template>
@@ -33,10 +33,9 @@
 import { onMounted, ref } from 'vue'
 import { fx } from '~/utils'
 import { animate, onScroll } from 'animejs'
-import MarketItemInfo from './components/MarketItemInfo.vue'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
 
-const { element: container } = useIntersectionObserver('market')
+const { element: container } = useIntersectionObserver('trade')
 const text = ref<HTMLElement | null>(null)
 const p1 = ref<HTMLElement | null>(null)
 const p2 = ref<HTMLElement | null>(null)
@@ -57,4 +56,6 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Add any section-specific styles here */
+</style>

@@ -32,6 +32,7 @@ import { fx } from '~/utils'
 import { animate, onScroll } from 'animejs'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
 import { useDecisionsStore } from './decisions.store'
+import { useActiveSectionStore } from '~/stores/activeSection'
 
 const { element: container } = useIntersectionObserver('decisions')
 const decisions = ref<HTMLElement | null>(null)
@@ -40,6 +41,7 @@ const p1 = ref<HTMLElement | null>(null)
 const p2 = ref<HTMLElement | null>(null)
 
 const decisionsStore = useDecisionsStore()
+const activeSectionStore = useActiveSectionStore()
 
 onMounted(() => {
     const elements = [text.value!, p1.value!, p2.value!]
@@ -60,6 +62,7 @@ onMounted(() => {
             if (decisionsStore.decisions.includes('expandWarehouse')) return
 
             setTimeout(() => {
+                if (activeSectionStore.activeSectionId !== 'decisions') return
                 decisionsStore.addDecision('expandWarehouse')
             }, 3000)
         },

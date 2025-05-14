@@ -20,13 +20,17 @@
                         >
                             {{ item.quantity }}
                             <span :class="item.possible ? 'text-muted-foreground' : ''">×</span>
-                            {{ itemStore.itemDefinitions[item.item].name }}
+                            {{ ITEM_DEFINITIONS[item.item as keyof typeof ITEM_DEFINITIONS].name }}
                         </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
                         <div class="text-sm text-muted-foreground max-w-64 space-y-2">
                             You have <span class="font-bold">{{ item.quantityAvailable }}</span>
-                            {{ itemStore.itemDefinitions[item.item].name.toLowerCase() }}
+                            {{
+                                ITEM_DEFINITIONS[
+                                    item.item as keyof typeof ITEM_DEFINITIONS
+                                ].name.toLowerCase()
+                            }}
                             available, but this order requires
                             <span class="font-bold">{{ item.quantity }}</span
                             >.
@@ -38,9 +42,6 @@
             <Badge
                 v-if="order.cash < 0"
                 class="text-center w-min h-min flex gap-2 whitespace-nowrap"
-                :class="
-                    -order.cash * quantityRequested > teamStore.teamStats.cash ? 'bg-red-500' : ''
-                "
             >
                 {{ formatString(-order.cash * quantityRequested) }}
             </Badge>
@@ -63,7 +64,10 @@
                         >
                             {{ item.quantity * quantityRequested }}
                             <span class="text-muted-foreground">×</span>
-                            {{ itemStore.itemDefinitions[item.item.key].name }}
+                            {{
+                                ITEM_DEFINITIONS[item.item.key as keyof typeof ITEM_DEFINITIONS]
+                                    .name
+                            }}
                         </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -106,20 +110,7 @@
             <Button type="button" variant="outline"> Cancel </Button>
         </DialogClose>
 
-        <Button v-if="gameStore.active && possible && quantityRequested > 0" @click="placeOrder">
-            Place Order
-        </Button>
-
-        <div v-else-if="placingOrder" class="self-end">
-            <Button disabled variant="outline">
-                <span class="flex items-center gap-2">
-                    <span class="scale-50">
-                        <LoadingSpinner />
-                    </span>
-                    <span> Placing Order </span>
-                </span>
-            </Button>
-        </div>
+        <Button v-if="quantityRequested > 0" @click="placeOrder"> Place Order </Button>
 
         <TooltipProvider v-else>
             <Tooltip :delayDuration="100">
@@ -151,25 +142,20 @@ import {
 } from '~/components/ui/number-field'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
 import { Badge } from '~/components/ui/badge'
-import type { AvailableItemTransformationOrder } from '@/game/item/item.interface'
-import { api } from '~/modules/api/api.utils'
-import { useAuthStore } from '~/modules/auth/auth.store'
-import { useItemStore } from '~/modules/item/item.store'
-import { formatString, handleError } from '~/app.utils'
-import { useTeamStore } from '~/modules/team/team.store'
-import { useGameStore } from '~/modules/team/modules/game/game.store'
-import LoadingSpinner from '~/components/LoadingSpinner.vue'
 
-const authStore = useAuthStore()
-const itemStore = (await useItemStore)()
-const teamStore = (await useTeamStore)()
-const gameStore = (await useGameStore)()
-
-const gameID = authStore.getUser<'team'>().gameID
-const teamID = authStore.getUser<'team'>()._id
+import { formatString, toast } from '~/utils'
+import { ITEM_DEFINITIONS } from '../manufacturing.config'
 
 const props = defineProps<{
-    order: AvailableItemTransformationOrder
+    order: {
+        key: string
+        reference: string
+        icon: string
+        placedOrderNumbers: number[]
+        inputs: { key: string; quantity: number }[]
+        outputs: { item: { key: string; quality: number }; quantity: number }[]
+        cash: number
+    }
 }>()
 
 const emits = defineEmits<{
@@ -192,7 +178,7 @@ const inputs = props.order.inputs
 const inputsWithQuantity = computed(() =>
     inputs.map((input) => {
         const quantity = input.quantity * (quantityRequested.value ?? 0)
-        const quantityAvailable = itemStore.itemCounts[input.key]?.available ?? 0
+        const quantityAvailable = Infinity
         const possible = quantityAvailable >= quantity
 
         return {
@@ -205,7 +191,7 @@ const inputsWithQuantity = computed(() =>
 )
 
 const hasWarehouseSpace = computed(() => {
-    const availableWarehouseCapacity = itemStore.warehouseCapacity
+    const availableWarehouseCapacity = Infinity
 
     const inputItemCount = inputsWithQuantity.value.reduce((acc, item) => {
         return acc + item.quantity
@@ -222,26 +208,12 @@ const possible = computed(() => {
     return hasWarehouseSpace.value && inputsWithQuantity.value.every((item) => item.possible)
 })
 
-const placingOrder = ref(false)
-
 async function placeOrder() {
-    placingOrder.value = true
-    try {
-        await api.game.warehouse.itemOrders.place.mutate({
-            gameID,
-            teamID,
-            key: props.order.key,
-            quantity: quantityRequested.value,
-        })
-
-        await itemStore.updateWarehouse()
-
-        // Close the dialog
-        emits('close')
-    } catch (e) {
-        handleError('Failed to place order', e)
-    }
-    placingOrder.value = false
+    toast.success('Order placed', {
+        description:
+            'You have placed an order for ' + quantityRequested.value + ' ' + props.order.reference,
+    })
+    emits('close')
 }
 </script>
 

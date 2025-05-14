@@ -40,6 +40,7 @@ watch(
             .add(black.value!, {
                 opacity: 1,
                 duration: 5000 * parseFloat(black.value!.style?.opacity || '0'),
+                ease: 'outExpo',
             })
 
             .call(() => {
@@ -50,8 +51,12 @@ watch(
                 await srcLoaded.value!
             }, '+=0')
 
-            .add(black.value!, { opacity: 1 - BACKGROUND_OPACITY, duration: 5000 }, '+=10')
-            .add(image.value!, { filter: ['blur(40px)', 'blur(0px)'], duration: 10000 }, '<<')
+            .add(black.value!, { opacity: 1 - BACKGROUND_OPACITY, duration: 2000 }, '+=10')
+            .add(
+                image.value!,
+                { filter: ['blur(40px)', 'blur(0px)'], duration: 5000, ease: 'outExpo' },
+                '<<',
+            )
     },
 )
 </script>

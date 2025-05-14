@@ -1,0 +1,81 @@
+import { colouredIcon, icon } from '~/utils'
+
+export const ITEM_DEFINITIONS = {
+    waste: {
+        name: 'Waste',
+        description: 'A waste item',
+        unit: 'box',
+        icon: icon('ri-delete-bin-line'),
+        development: 'raw',
+    },
+    solvent: {
+        name: 'Solvent',
+        description: 'The base chemical used in most paints.',
+        unit: 'barrel',
+        icon: icon('ri-flask-line'),
+        development: 'raw',
+    },
+    pigmentYellow: {
+        name: 'Yellow Pigment',
+        description: 'A yellow pigment used in paint, made from cadmium sulfide.',
+        unit: 'box',
+        icon: colouredIcon('rgb(250 204 21)', 'ri-dropper-line'),
+        development: 'raw',
+    },
+    pigmentRed: {
+        name: 'Red Pigment',
+        description: 'A red pigment used in paint, made from iron oxide.',
+        unit: 'box',
+        icon: colouredIcon('rgb(239 68 68)', 'ri-dropper-line'),
+        development: 'raw',
+    },
+    pigmentBlue: {
+        name: 'Blue Pigment',
+        description: 'A blue pigment used in paint, made from sodium aluminosilicate.',
+        unit: 'box',
+        icon: colouredIcon('rgb(6 182 212)', 'ri-dropper-line'),
+        development: 'raw',
+    },
+    paintYellow: {
+        name: 'Yellow Paint',
+        description: 'A basic yellow paint. Can be used for a variety of applications.',
+        unit: 'tin',
+        icon: colouredIcon('rgb(250 204 21)', 'ri-paint-fill'),
+        development: 'basic',
+    },
+    paintRed: {
+        name: 'Red Paint',
+        description: 'A basic red paint. Can be used for a variety of applications.',
+        unit: 'tin',
+        icon: colouredIcon('rgb(239 68 68)', 'ri-paint-fill'),
+        development: 'basic',
+    },
+    paintBlue: {
+        name: 'Blue Paint',
+        description: 'A basic blue paint. Can be used for a variety of applications.',
+        unit: 'tin',
+        icon: colouredIcon('rgb(6 182 212)', 'ri-paint-fill'),
+        development: 'basic',
+    },
+    paintPurple: {
+        name: 'Purple Paint',
+        description: 'A purple paint. Can be used for more specialised applications.',
+        unit: 'tin',
+        icon: colouredIcon('rgb(99 102 241)', 'ri-paint-fill'),
+        development: 'intermediate',
+    },
+    paintGreen: {
+        name: 'Green Paint',
+        description: 'A green paint. Can be used for more specialised applications.',
+        unit: 'tin',
+        icon: colouredIcon('rgb(132 204 22)', 'ri-paint-fill'),
+        development: 'intermediate',
+    },
+    paintOrange: {
+        name: 'Orange Paint',
+        description: 'An orange paint. Can be used for more specialised applications.',
+        unit: 'tin',
+        icon: colouredIcon('rgb(249 115 22)', 'ri-paint-fill'),
+        development: 'intermediate',
+    },
+}

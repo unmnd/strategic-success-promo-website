@@ -3,8 +3,8 @@
         <li v-for="(item, index) in itemsStandardised" :key="index">
             {{ item.qty }}
             <span class="text-muted-foreground mx-1">×</span>
-            <span v-html="itemStore.itemDefinitions[item.key].icon"></span>
-            {{ itemStore.itemDefinitions[item.key].name }}
+            <span v-html="ITEM_DEFINITIONS[item.key as keyof typeof ITEM_DEFINITIONS].icon"></span>
+            {{ ITEM_DEFINITIONS[item.key as keyof typeof ITEM_DEFINITIONS].name }}
         </li>
 
         <li v-if="cash">
@@ -15,19 +15,15 @@
 </template>
 
 <script setup lang="ts">
-import type { Amount } from '@/game/bank/bank.interface'
-import type { ItemKey } from '@/game/item/item.interface.base'
-import { formatter } from '~/app.utils'
-import { useItemStore } from '~/modules/item/item.store'
-
-const itemStore = (await useItemStore)()
+import { formatter } from '~/utils'
+import { ITEM_DEFINITIONS } from '../manufacturing.config'
 
 type Item =
     | {
-          key: ItemKey
+          key: string
       }
     | {
-          itemKey: ItemKey
+          itemKey: string
       }
 
 type Quantity =
@@ -40,7 +36,7 @@ type Quantity =
 
 const props = defineProps<{
     items: (Item & Quantity)[]
-    cash?: Amount
+    cash?: number
 }>()
 
 const itemsStandardised = props.items.map((item) => {

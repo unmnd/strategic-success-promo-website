@@ -1,5 +1,5 @@
 <template>
-    <div ref="main" class="hidden lg:block pl-12">
+    <div ref="main" class="hidden lg:block pl-12 overflow-x-hidden">
         <Toaster />
 
         <!-- Global Background -->
@@ -11,11 +11,15 @@
 
         <IntroSection ref="introSection" class="pr-12" />
         <InteractivityNote ref="interactivitySection" class="pr-12" />
-        <DecisionsSection ref="decisionsSection" />
-        <SkillsSection ref="skillsSection" />
-        <MarketSection ref="marketSection" />
-        <WarehouseSection ref="warehouseSection" />
-        <BankSection ref="bankSection" />
+
+        <div
+            v-for="(section, key) in sections"
+            :key="key"
+            :ref="(el) => setSectionRef(key, el)"
+            class="mb-64 pr-12 overflow-hidden"
+        >
+            <component :is="section.component" />
+        </div>
 
         <!-- Scroll Prompt -->
         <!-- <ScrollPrompt /> -->
@@ -40,41 +44,56 @@
 // import ScrollPrompt from './components/ScrollPrompt.vue'
 import Background from './components/Background.vue'
 import { useColorMode } from '@vueuse/core'
-import { ref, provide } from 'vue'
+import { ref, provide, reactive, type Component } from 'vue'
+import { defineAsyncComponent } from 'vue'
 
 import { Toaster } from './components/ui/sonner'
 import IntroSection from './sections/intro/IntroSection.vue'
 import InteractivityNote from './sections/intro/InteractivityNote.vue'
-import DecisionsSection from './sections/decisions/DecisionsSection.vue'
-import SkillsSection from './sections/skills/SkillsSection.vue'
-import MarketSection from './sections/market/MarketSection.vue'
-import WarehouseSection from './sections/warehouse/WarehouseSection.vue'
-import BankSection from './sections/bank/BankSection.vue'
 import ProgressTimeline from './components/ProgressTimeline.vue'
+import { MAIN_SECTIONS } from './config/stage.config'
 
 const introSection = ref<InstanceType<typeof IntroSection> | null>(null)
 const interactivitySection = ref<InstanceType<typeof InteractivityNote> | null>(null)
-const decisionsSection = ref<InstanceType<typeof DecisionsSection> | null>(null)
-const skillsSection = ref<InstanceType<typeof SkillsSection> | null>(null)
-const marketSection = ref<InstanceType<typeof MarketSection> | null>(null)
-const warehouseSection = ref<InstanceType<typeof WarehouseSection> | null>(null)
-const bankSection = ref<InstanceType<typeof BankSection> | null>(null)
 
-const sectionRefs = {
+const sections = reactive(
+    MAIN_SECTIONS.reduce(
+        (acc, section) => {
+            acc[section.id] = {
+                component: defineAsyncComponent(section.component),
+            }
+            return acc
+        },
+        {} as Record<string, { component: Component }>,
+    ),
+)
+
+const sectionRefs = reactive({
     intro: introSection,
     interactivity: interactivitySection,
-    decisions: decisionsSection,
-    skills: skillsSection,
-    market: marketSection,
-    warehouse: warehouseSection,
-    bank: bankSection,
+    ...MAIN_SECTIONS.reduce(
+        (acc, section) => {
+            acc[section.id] = ref(null)
+            return acc
+        },
+        {} as Record<string, Component>,
+    ),
+})
+
+const setSectionRef = (
+    key: string,
+    el: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+) => {
+    if (el) {
+        sectionRefs[key as keyof typeof sectionRefs] = el
+    }
 }
 
 // Function to scroll to a section
 const scrollToSection = (sectionId: string) => {
     const section = sectionRefs[sectionId as keyof typeof sectionRefs]
-    if (section?.value?.$el) {
-        section.value.$el.scrollIntoView({ behavior: 'smooth' })
+    if (section?.$el) {
+        section.$el.scrollIntoView({ behavior: 'smooth' })
     }
 }
 

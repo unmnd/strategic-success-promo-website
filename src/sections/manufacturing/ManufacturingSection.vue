@@ -1,30 +1,27 @@
 <template>
-    <div ref="container" class="w-full flex flex-col items-center">
-        <div class="pt-20 pb-8 max-w-3xl text-center" ref="text">
+    <div ref="container" class="w-full flex items-center justify-center gap-16 px-8">
+        <div ref="manufacturing" class="basis-2/3">
+            <Manufacturing class="max-w-4xl" />
+        </div>
+
+        <div class="flex flex-col basis-1/3" ref="text">
             <h1 class="text-2xl font-bold pb-4">
-                <i class="ri-line-chart-fill"></i>
-                Market
+                <i class="ri-building-3-fill"></i>
+                Manufacturing
             </h1>
             <div class="space-y-4">
-                <p ref="p1">A living, breathing economy.</p>
+                <p ref="p1">Turn raw into revenue.</p>
 
                 <p ref="p2">
-                    Prices of raw materials and products shift organically based on
-                    <b>team activity</b> and <b>external news</b>. Supply and demand are king.
+                    Build your <b>production line</b>, add value to materials, and manage
+                    <b>order fulfilment</b>.
                 </p>
 
                 <p ref="p3">
-                    From pandemics to political instability—reacting to <b>market shocks</b> is part
-                    of the game.
+                    Can you deliver on time? Do you have the space and stock?
+                    <b>Smarter systems</b> mean stronger profits.
                 </p>
             </div>
-        </div>
-
-        <div
-            ref="market"
-            class="w-full max-w-6xl flex items-center justify-center p-4 mb-8 bg-card rounded-xl border"
-        >
-            <MarketItemInfo />
         </div>
     </div>
 </template>
@@ -33,10 +30,10 @@
 import { onMounted, ref } from 'vue'
 import { fx } from '~/utils'
 import { animate, onScroll } from 'animejs'
-import MarketItemInfo from './components/MarketItemInfo.vue'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
+import Manufacturing from './components/Manufacturing.vue'
 
-const { element: container } = useIntersectionObserver('market')
+const { element: container } = useIntersectionObserver('manufacturing')
 const text = ref<HTMLElement | null>(null)
 const p1 = ref<HTMLElement | null>(null)
 const p2 = ref<HTMLElement | null>(null)
