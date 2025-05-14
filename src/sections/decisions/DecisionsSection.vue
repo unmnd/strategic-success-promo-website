@@ -1,5 +1,5 @@
 <template>
-    <div ref="container" class="w-screen h-screen flex items-center justify-center gap-16 px-8">
+    <div ref="container" class="w-full h-screen flex items-center justify-center gap-16 px-8">
         <div ref="decisions" class="basis-2/3">
             <Decisions class="max-w-4xl" />
         </div>

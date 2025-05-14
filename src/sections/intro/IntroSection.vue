@@ -1,7 +1,7 @@
 <template>
     <div
         ref="container"
-        class="w-screen h-screen flex flex-col items-center justify-center text-center"
+        class="w-full h-screen flex flex-col items-center justify-center text-center"
     >
         <div ref="logo" class="opacity-0">
             <Logo />

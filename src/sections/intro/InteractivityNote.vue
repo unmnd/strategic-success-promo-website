@@ -1,5 +1,5 @@
 <template>
-    <div ref="container" class="w-screen h-screen flex items-center justify-center">
+    <div ref="container" class="w-full h-screen flex items-center justify-center">
         <div class="text-muted-foreground text-sm">
             <i class="ri-information-line"></i>
 

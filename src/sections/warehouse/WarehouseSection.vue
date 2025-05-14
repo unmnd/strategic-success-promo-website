@@ -1,5 +1,5 @@
 <template>
-    <div ref="container" class="w-screen min-h-screen flex items-center gap-16 px-8">
+    <div ref="container" class="w-full min-h-screen flex items-center gap-16 px-8">
         <div class="pt-20 pb-8 max-w-3xl text-center">
             <h1 ref="title" class="text-2xl font-bold pb-4">
                 <i class="ri-store-2-fill"></i>
