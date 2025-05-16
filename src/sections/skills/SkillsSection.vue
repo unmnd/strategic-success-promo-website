@@ -1,7 +1,7 @@
 <template>
     <div ref="container" class="w-full flex items-center justify-center gap-16 px-8">
         <div class="flex flex-col basis-1/3 text-right" ref="text">
-            <h1 class="text-2xl font-bold pb-4">
+            <h1 class="text-2xl unica-one-regular pb-4">
                 <i class="ri-brain-fill"></i>
                 Skills
             </h1>

@@ -52,6 +52,11 @@ export const SECTIONS = [
         component: () => import('../sections/trade/TradeSection.vue'),
         background: corporateMeeting,
     },
+    {
+        id: 'partnerships',
+        component: () => import('../sections/partnerships/PartnershipsSection.vue'),
+        background: corporateMeeting,
+    },
 ] as const
 
 // Export filtered sections for main content (excluding intro and interactivity)
