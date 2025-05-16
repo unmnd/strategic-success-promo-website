@@ -16,7 +16,10 @@ export function useIntersectionObserver(sectionId: string) {
                 })
             },
             {
-                threshold: 0.5, // Trigger when 50% of the section is visible
+                // Use rootMargin to create a trigger boundary at 50% of viewport height
+                // Negative top margin means we're pushing the boundary up from the bottom of viewport
+                rootMargin: '-50% 0px 0px 0px',
+                threshold: 0, // Trigger as soon as any part enters this boundary
             },
         )
 
