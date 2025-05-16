@@ -7,7 +7,7 @@
         <div
             v-for="section in filteredSections"
             :key="section"
-            :ref="(el) => setSectionRef(el as HTMLElement | null, section)"
+            :ref="(el: HTMLElement | null) => setSectionRef(el, section)"
             class="transition uppercase text-end pr-2 [writing-mode:vertical-lr] unica-one-regular pl-2 hover:opacity-100 hover:translate-x-[0.25rem]"
             :class="{
                 'opacity-20': section !== activeSectionStore.activeSectionId,

@@ -94,7 +94,20 @@ const scrollToSection = (sectionId: string) => {
     const section = sectionRefs[sectionId as keyof typeof sectionRefs] as HTMLElement | null
 
     if (section) {
-        section.scrollIntoView({ behavior: 'smooth' })
+        // Get the element's position relative to the viewport
+        const rect = section.getBoundingClientRect()
+        // Get the current scroll position
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+        // Calculate the absolute position of the element
+        const absoluteTop = scrollTop + rect.top
+        // Set a small offset to ensure the section is properly visible (can adjust as needed)
+        const offset = 20
+
+        // Scroll to the exact top of the section with the offset
+        window.scrollTo({
+            top: absoluteTop - offset,
+            behavior: 'smooth',
+        })
     } else {
         console.error(`Section not found: ${sectionId}`)
     }
