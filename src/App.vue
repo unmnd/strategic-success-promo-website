@@ -44,7 +44,7 @@
 // import ScrollPrompt from './components/ScrollPrompt.vue'
 import Background from './components/Background.vue'
 import { useColorMode } from '@vueuse/core'
-import { ref, provide, reactive, type Component } from 'vue'
+import { ref, provide, reactive, type Component, markRaw } from 'vue'
 import { defineAsyncComponent } from 'vue'
 
 import { Toaster } from './components/ui/sonner'
@@ -60,7 +60,7 @@ const sections = reactive(
     MAIN_SECTIONS.reduce(
         (acc, section) => {
             acc[section.id] = {
-                component: defineAsyncComponent(section.component),
+                component: markRaw(defineAsyncComponent(section.component)),
             }
             return acc
         },
