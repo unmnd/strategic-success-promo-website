@@ -1,5 +1,5 @@
 <template>
-    <div ref="main" class="hidden lg:block pl-12 overflow-x-hidden">
+    <div ref="main" class="hidden lg:block pl-12">
         <Toaster />
 
         <!-- Global Background -->
@@ -16,7 +16,7 @@
             v-for="(section, key) in sections"
             :key="key"
             :ref="(el) => setSectionRef(key, el)"
-            class="mb-64 pr-12 overflow-hidden"
+            class="mb-64 overflow-hidden"
         >
             <component :is="section.component" />
         </div>
@@ -91,9 +91,12 @@ const setSectionRef = (
 
 // Function to scroll to a section
 const scrollToSection = (sectionId: string) => {
-    const section = sectionRefs[sectionId as keyof typeof sectionRefs]
-    if (section?.$el) {
-        section.$el.scrollIntoView({ behavior: 'smooth' })
+    const section = sectionRefs[sectionId as keyof typeof sectionRefs] as HTMLElement | null
+
+    if (section) {
+        section.scrollIntoView({ behavior: 'smooth' })
+    } else {
+        console.error(`Section not found: ${sectionId}`)
     }
 }
 
