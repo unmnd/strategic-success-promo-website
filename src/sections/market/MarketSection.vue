@@ -36,7 +36,7 @@ import { animate, onScroll } from 'animejs'
 import MarketItemInfo from './components/MarketItemInfo.vue'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
 
-const { element: container } = useIntersectionObserver('market')
+const { element: market } = useIntersectionObserver('market')
 const text = ref<HTMLElement | null>(null)
 const p1 = ref<HTMLElement | null>(null)
 const p2 = ref<HTMLElement | null>(null)
