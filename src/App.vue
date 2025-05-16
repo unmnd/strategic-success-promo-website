@@ -16,7 +16,7 @@
             v-for="(section, key) in sections"
             :key="key"
             :ref="(el) => setSectionRef(key, el)"
-            class="mb-64 overflow-hidden"
+            class="not-last:mb-64 overflow-hidden"
         >
             <component :is="section.component" />
         </div>
