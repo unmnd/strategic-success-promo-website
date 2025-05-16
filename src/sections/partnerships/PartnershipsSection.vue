@@ -51,16 +51,6 @@ onMounted(() => {
             }),
         })
     }
-
-    // Main content animation
-    animate(partnershipForm.value!, {
-        ...fx.fadeIn,
-        autoplay: onScroll({
-            enter: '70% top',
-            leave: '0 top',
-            sync: 0.2,
-        }),
-    })
 })
 </script>
 

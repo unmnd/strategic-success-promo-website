@@ -1,18 +1,35 @@
 <template>
-    <Command class="h-[300px]">
-        <CommandInput class="h-9" placeholder="Search clause..." />
-        <CommandEmpty class="h-full">
-            <div class="h-full flex items-center justify-center">No clauses found.</div>
-        </CommandEmpty>
-        <CommandList>
-            <template v-for="clauseGroup in clauseGroups" :key="clauseGroup.heading">
-                <CommandGroup :heading="clauseGroup.heading">
-                    <CommandItem
+    <div class="h-[300px] w-full border rounded-md bg-background overflow-hidden flex flex-col">
+        <div class="flex items-center border-b px-3">
+            <input
+                v-model="searchQuery"
+                class="flex h-9 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder="Search clause..."
+            />
+        </div>
+
+        <div class="overflow-y-auto">
+            <div
+                v-if="filteredGroups.length === 0"
+                class="h-full flex items-center justify-center p-6"
+            >
+                No clauses found.
+            </div>
+
+            <div v-else>
+                <template v-for="clauseGroup in filteredGroups" :key="clauseGroup.heading">
+                    <div class="pt-2 px-2 text-xs font-medium text-muted-foreground">
+                        {{ clauseGroup.heading }}
+                    </div>
+
+                    <div
                         v-for="clauseID in clauseGroup.clauses"
                         :key="clauseID"
-                        :value="clauseID"
+                        @click="selectClause(clauseID)"
                     >
-                        <div class="flex gap-2 items-center">
+                        <div
+                            class="flex gap-2 items-center relative cursor-default rounded-sm px-2 py-3 text-sm outline-hidden select-none hover:bg-accent hover:text-accent-foreground transition-colors"
+                        >
                             <i
                                 class="text-xl mr-1"
                                 :class="clauses[clauseID as keyof typeof clauses].icon"
@@ -28,26 +45,55 @@
                                 </div>
                             </div>
                         </div>
-                    </CommandItem>
-                </CommandGroup>
+                    </div>
 
-                <CommandSeparator class="last:hidden" />
-            </template>
-        </CommandList>
-    </Command>
+                    <div class="h-px bg-border my-1 last:hidden"></div>
+                </template>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import { clauses, clauseGroups } from '../partnerships.config'
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-    CommandSeparator,
-} from '~/components/ui/command'
+
+const searchQuery = ref('')
+
+const filteredGroups = computed(() => {
+    if (!searchQuery.value.trim()) {
+        return clauseGroups
+    }
+
+    const query = searchQuery.value.toLowerCase()
+
+    return (
+        clauseGroups
+            .map((group) => {
+                // Filter clauses within each group
+                const filteredClauses = group.clauses.filter((clauseID) => {
+                    const clause = clauses[clauseID as keyof typeof clauses]
+                    return (
+                        clause.title.toLowerCase().includes(query) ||
+                        clause.description.toLowerCase().includes(query)
+                    )
+                })
+
+                // Return a new group object with only matching clauses
+                return {
+                    ...group,
+                    clauses: filteredClauses,
+                }
+            })
+            // Only keep groups that have at least one matching clause
+            .filter((group) => group.clauses.length > 0)
+    )
+})
+
+function selectClause(clauseID: string) {
+    // Handle clause selection - you can emit an event or implement other logic here
+    console.log('Selected clause:', clauseID)
+}
 </script>
 
 <style scoped></style>
