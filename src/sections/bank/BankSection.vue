@@ -1,7 +1,7 @@
 <template>
     <div ref="container" class="w-full flex flex-col items-center">
         <div class="pt-20 pb-8 max-w-3xl text-center" ref="text">
-            <h1 class="text-2xl font-bold pb-4">
+            <h1 class="text-2xl unica-one-regular pb-4">
                 <i class="ri-bank-fill"></i>
                 Bank
             </h1>

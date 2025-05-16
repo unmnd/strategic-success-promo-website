@@ -5,7 +5,7 @@
         </div>
 
         <div class="flex flex-col basis-1/3" ref="text">
-            <h1 class="text-2xl font-bold pb-4">
+            <h1 class="text-2xl unica-one-regular pb-4">
                 <i class="ri-building-3-fill"></i>
                 Manufacturing
             </h1>

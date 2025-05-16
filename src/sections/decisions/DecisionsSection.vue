@@ -5,7 +5,7 @@
         </div>
 
         <div class="flex flex-col basis-1/3" ref="text">
-            <h1 class="text-2xl font-bold pb-4">
+            <h1 class="text-2xl unica-one-regular pb-4">
                 <i class="ri-briefcase-2-fill"></i>
                 Decisions
             </h1>
@@ -64,7 +64,7 @@ onMounted(() => {
             setTimeout(() => {
                 if (activeSectionStore.activeSectionId !== 'decisions') return
                 decisionsStore.addDecision('expandWarehouse')
-            }, 3000)
+            }, 5000)
         },
     })
 })

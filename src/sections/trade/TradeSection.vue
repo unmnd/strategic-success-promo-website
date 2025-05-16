@@ -1,7 +1,7 @@
 <template>
     <div ref="container" class="w-full flex flex-col items-center">
         <div class="pt-20 pb-8 max-w-3xl text-center" ref="text">
-            <h1 class="text-2xl font-bold pb-4">
+            <h1 class="text-2xl unica-one-regular pb-4">
                 <i class="ri-exchange-funds-fill"></i>
                 Trade
             </h1>
@@ -24,7 +24,7 @@
             ref="trade"
             class="w-full max-w-6xl flex items-center justify-center p-4 mb-8 bg-card rounded-xl border"
         >
-            <!-- Placeholder for future trade component -->
+            <TradeNewOffer />
         </div>
     </div>
 </template>
@@ -34,6 +34,8 @@ import { onMounted, ref } from 'vue'
 import { fx } from '~/utils'
 import { animate, onScroll } from 'animejs'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
+
+import TradeNewOffer from './components/TradeNewOffer.vue'
 
 const { element: container } = useIntersectionObserver('trade')
 const text = ref<HTMLElement | null>(null)
