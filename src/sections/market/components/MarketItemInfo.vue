@@ -36,30 +36,6 @@
 
                                 <div class="flex flex-col items-start justify-center">
                                     <span class="mb-1"> / {{ itemDefinition.unit }} </span>
-
-                                    <Badge
-                                        :class="[
-                                            percentChange > 0
-                                                ? 'bg-green-600 text-white'
-                                                : percentChange < 0
-                                                  ? 'bg-red-600 text-white'
-                                                  : 'bg-muted-foreground text-black border',
-                                            'flex items-center gap-1 ml-2 px-2 py-0.5 text-xs font-semibold',
-                                        ]"
-                                    >
-                                        <template v-if="percentChange > 0">
-                                            <i class="ri-arrow-up-s-line"></i>
-                                            <span>+{{ percentChange.toFixed(2) }}%</span>
-                                        </template>
-                                        <template v-else-if="percentChange < 0">
-                                            <i class="ri-arrow-down-s-line"></i>
-                                            <span>{{ percentChange.toFixed(2) }}%</span>
-                                        </template>
-                                        <template v-else>
-                                            <i class="ri-subtract-line"></i>
-                                            <span>0.00%</span>
-                                        </template>
-                                    </Badge>
                                 </div>
                             </Button>
                         </PopoverTrigger>
@@ -175,8 +151,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
 import MarketItemInfoDepthChart from './MarketItemInfoDepthChart.vue'
 import MarketItemInfoPriceHistoryChart from './MarketItemInfoPriceHistoryChart.vue'
 import MarketItemInfoStats from './MarketItemInfoStats.vue'
@@ -225,10 +199,6 @@ const {
     marketDepth,
     lastPrice,
 } = storeToRefs(useMarketStore())
-
-const percentChange = computed(() => {
-    return ((itemPrice.value - 3100) / itemPrice.value) * 100
-})
 </script>
 
 <style></style>
